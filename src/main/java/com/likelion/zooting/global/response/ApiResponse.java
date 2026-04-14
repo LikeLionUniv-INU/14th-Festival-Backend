@@ -1,9 +1,14 @@
 package com.likelion.zooting.global.response;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+
+@JsonPropertyOrder({"isSuccess", "code", "message", "result"})
 public record ApiResponse<T>(
         boolean isSuccess,
         String code,
         String message,
+        @JsonInclude(JsonInclude.Include.NON_NULL)
         T result
 ) {
     // 데이터가 있는 성공 응답
