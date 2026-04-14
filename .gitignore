@@ -41,4 +41,3 @@ out/
 
 ### Env & Config ###
 .env
-src/main/resources/application-local.yaml
