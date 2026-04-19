@@ -17,12 +17,12 @@ public class Match {
     private Long matchId;
 
     @ManyToOne(fetch = FetchType.LAZY)  // 최적화를 위해 USER를 DB에서 가져오지 않도록 설정
-    @JoinColumn(name = "male_user_id")
-    private User maleUser;
+    @JoinColumn(name = "male_user_id")  // 외래키 설정
+    private User maleUserId;
 
-    @ManyToOne(fetch = FetchType.LAZY)  // 최적화를 위해 동물상을 DB에서 가져오지 않도록 설정
-    @JoinColumn(name = "female_user_id")
-    private User femaleUser;
+    @ManyToOne(fetch = FetchType.LAZY)  // 최적화를 위해 USER를 DB에서 가져오지 않도록 설정
+    @JoinColumn(name = "female_user_id")    // 외래키 설정
+    private User femaleUserId;
 
     @Column(name = "interest_num")
     private Integer interestNum;
