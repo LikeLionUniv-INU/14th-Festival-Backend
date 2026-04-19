@@ -18,9 +18,9 @@ public class User {
     @Column(name = "user_id")
     private Long userId;
 
-    @ManyToOne(fetch = FetchType.LAZY)  // 최적화를 위해 동물상을 DB에서 가져오지 않도록 설정
+    @ManyToOne(fetch = FetchType.LAZY)  // 최적화를 위해 ANIMAL_TYPE을 DB에서 가져오지 않도록 설정
     @JoinColumn(name = "animal_type_id")    // 외래키 설정
-    private AnimalType animalType;
+    private AnimalType animalTypeId;
 
     @Column(name = "instagramId", length = 50)
     private String instagramId;
