@@ -7,7 +7,7 @@ import lombok.*;
 @Entity
 @Getter
 @Setter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor(access = AccessLevel.PROTECTED)  // JPA만 접근 가능
 @AllArgsConstructor
 @Table(name = "MATCH")
 public class Match {
@@ -16,11 +16,11 @@ public class Match {
     @Column(name = "match_id")
     private Long matchId;
 
-    @ManyToOne(fetch = FetchType.LAZY) // DB에서
+    @ManyToOne(fetch = FetchType.LAZY)  // 최적화를 위해 USER를 DB에서 가져오지 않도록 설정
     @JoinColumn(name = "male_user_id")
     private User maleUser;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)  // 최적화를 위해 동물상을 DB에서 가져오지 않도록 설정
     @JoinColumn(name = "female_user_id")
     private User femaleUser;
 
