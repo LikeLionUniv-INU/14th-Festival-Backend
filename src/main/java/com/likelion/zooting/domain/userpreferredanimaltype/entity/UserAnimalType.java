@@ -19,10 +19,10 @@ public class UserAnimalType {
 
     @ManyToOne(fetch = FetchType.LAZY)  // 최적화를 위해 USER를 DB에서 가져오지 않도록 설정
     @JoinColumn(name = "user_id")   // 외래키 설정
-    private User userId;
+    private User user;  // DB로 저장될 땐 PK로 저장되지만, Entity로 가져오므로 user로 수정
 
     @ManyToOne(fetch = FetchType.LAZY)  // 최적화를 위해 ANIMAL_TYPE을 DB에서 가져오지 않도록 설정
     @JoinColumn(name = "animal_type_id")    // 외래키 설정
-    private AnimalType animalTypeId;
+    private AnimalType animalType;  // DB로 저장될 땐 PK로 저장되지만, Entity로 가져오므로 animalType으로 지었다.
 
 }
