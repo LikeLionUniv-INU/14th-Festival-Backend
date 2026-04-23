@@ -28,11 +28,13 @@ public class User {
     @Column(name = "user_pw", length = 255)
     private String UserPw;
 
+    @Enumerated(EnumType.STRING)    // 데이터 안정성을 위해, DB에 저장할 경우 문자열로 저장할 것을 명시
     @Column(name = "gender", length = 10)
-    private String gender;
+    private Gender gender;
 
+    @Enumerated(EnumType.STRING)    // 데이터 안정성을 위해, DB에 저장할 경우 문자열로 저장할 것을 명시
     @Column(name = "status", length = 10)
-    private String status;
+    private Status status;
 
     @Column(name = "is_complete", nullable = false) // null값 금지
     private boolean isComplete;
