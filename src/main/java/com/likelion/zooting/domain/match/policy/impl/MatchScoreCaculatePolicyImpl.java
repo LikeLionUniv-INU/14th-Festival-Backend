@@ -1,6 +1,6 @@
 package com.likelion.zooting.domain.match.policy.impl;
 
-import com.likelion.zooting.domain.match.exception.MatchErrorCode;
+import com.likelion.zooting.domain.match.exception.MatchInnerErrorCode;
 import com.likelion.zooting.domain.match.policy.MatchScoreCalculatePolicy;
 import com.likelion.zooting.domain.match.repository.UserMatchRepository;
 import com.likelion.zooting.domain.match.repository.data.UserAnimalMatchCandidate;
@@ -31,9 +31,9 @@ public class MatchScoreCaculatePolicyImpl implements MatchScoreCalculatePolicy {
         boolean[][] femaleToMale = new boolean[maleUserIdIndex.size()][femaleUserIdIndex.size()];   // 동물상(여성) -> 선호 동물상(남성)
 
         if (maleUser.isEmpty())
-            throw new GeneralException(MatchErrorCode.MALE_USER_ANIMAL_MATCH_CANDIDATE);    // 동물상 계산을 위한 남성 사용자 검증
+            throw new GeneralException(MatchInnerErrorCode.MALE_USER_ANIMAL_MATCH_CANDIDATE);    // 동물상 계산을 위한 남성 사용자 검증
         if (femaleUser.isEmpty())
-            throw new GeneralException(MatchErrorCode.FEMALE_USER_ANIMAL_MATCH_CANDIDATE); // 동물상 계산을 위한 여성 사용자 검증
+            throw new GeneralException(MatchInnerErrorCode.FEMALE_USER_ANIMAL_MATCH_CANDIDATE); // 동물상 계산을 위한 여성 사용자 검증
 
         for (UserAnimalMatchCandidate m : maleUser) {
             if (m == null) continue;        // Case 1(데이터 신규 추가)를 위한 장치
@@ -74,9 +74,9 @@ public class MatchScoreCaculatePolicyImpl implements MatchScoreCalculatePolicy {
         List<UserInterestMatchCandidate> femaleUserList = userMatchRepository.findUserInterestMatchCandidates(Gender.FEMALE, Status.SUBMITTED);  // 제출한 여성 사용자의 id와 관심사 데이터를 가져온다.
 
         if (maleUserList.isEmpty())
-            throw new GeneralException(MatchErrorCode.MALE_USER_INTEREST_MATCH_CANDIDATE);     // 관심사 매칭 점수 계산 전 남성 사용자 후보 리스트를 검증한다.
+            throw new GeneralException(MatchInnerErrorCode.MALE_USER_INTEREST_MATCH_CANDIDATE);     // 관심사 매칭 점수 계산 전 남성 사용자 후보 리스트를 검증한다.
         if (femaleUserList.isEmpty())
-            throw new GeneralException(MatchErrorCode.FEMALE_USER_INTEREST_MATCH_CANDIDATE);   // 관심사 매칭 점수 계산 전 여성 사용자 후보 리스트를 검증한다.
+            throw new GeneralException(MatchInnerErrorCode.FEMALE_USER_INTEREST_MATCH_CANDIDATE);   // 관심사 매칭 점수 계산 전 여성 사용자 후보 리스트를 검증한다.
 
         Set<UserInterestMatchCandidate> maleUserSet = new HashSet<>(maleUserList);      // 중복 제거를 위해, 남성 사용자: List -> Set으로 변환한다.
         Set<UserInterestMatchCandidate> femaleUserSet = new HashSet<>(femaleUserList);  // 중복 제거를 위해, 여성 사용자: List -> Set으로 변환한다.
@@ -118,9 +118,9 @@ public class MatchScoreCaculatePolicyImpl implements MatchScoreCalculatePolicy {
         List<UserMovieGenreMatchCandidate> femaleUser = userMatchRepository.findUserMovieGenreMatchCandidate(Gender.FEMALE, Status.SUBMITTED); // 제출한 여성 사용자의 id와 영화 장르 데이터를 가져온다.
 
         if (maleUser.isEmpty())
-            throw new GeneralException(MatchErrorCode.MALE_USER_MOVIE_GENRE_MATCH_CANDIDATE);      // 영화 장르 매칭 점수 계산 전 남성 사용자 후보 리스트를 검증한다.
+            throw new GeneralException(MatchInnerErrorCode.MALE_USER_MOVIE_GENRE_MATCH_CANDIDATE);      // 영화 장르 매칭 점수 계산 전 남성 사용자 후보 리스트를 검증한다.
         if (femaleUser.isEmpty())
-            throw new GeneralException(MatchErrorCode.FEMALE_USER_MOVIE_GENRE_MATCH_CANDIDATE);    // 영화 장르 매칭 점수 계산 전 남성 사용자 후보 리스트를 검증한다.
+            throw new GeneralException(MatchInnerErrorCode.FEMALE_USER_MOVIE_GENRE_MATCH_CANDIDATE);    // 영화 장르 매칭 점수 계산 전 남성 사용자 후보 리스트를 검증한다.
 
         Set<UserMovieGenreMatchCandidate> maleUserSet = new HashSet<>(maleUser);        // 중복 제거를 위해, 남성 사용자: List -> Set으로 변환한다.
         Set<UserMovieGenreMatchCandidate> femaleUserSet = new HashSet<>(femaleUser);    // 중복 제거를 위해, 여성 사용자: List -> Set으로 변환한다.
