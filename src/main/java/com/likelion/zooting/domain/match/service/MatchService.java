@@ -3,18 +3,16 @@ package com.likelion.zooting.domain.match.service;
 import com.likelion.zooting.domain.match.entity.Match;
 import com.likelion.zooting.domain.match.exception.MatchErrorCode;
 import com.likelion.zooting.domain.match.repository.MatchRepository;
+import com.likelion.zooting.domain.match.repository.UserMatchRepository;
 import com.likelion.zooting.domain.match.repository.data.UserAnimalMatchCandidate;
+import com.likelion.zooting.domain.match.repository.data.UserInterestMatchCandidate;
 import com.likelion.zooting.domain.user.entity.Gender;
 import com.likelion.zooting.domain.user.entity.Status;
-import com.likelion.zooting.domain.match.repository.UserMatchRepository;
 import com.likelion.zooting.global.exception.GeneralException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -119,8 +117,10 @@ public class MatchService {
      * @return 동물상 점수가 반영된 사용자간 점수 인접 리스트
      */
     private int[][] calculateAnimalTypeScore(int[][] scoreBoard, Map<Long, Integer> maleUserIdIndex, Map<Long, Integer> femaleUserIdIndex) {
-        List<UserAnimalMatchCandidate> maleUser = userMatchRepository.findUserAnimalMatchCandidates(Gender.MALE, Status.SUBMITTED);      // 제출한 남성 사용자의 id와 동물상, 선호하는 동물상 데이터를 가져온다.
-        List<UserAnimalMatchCandidate> femaleUser = userMatchRepository.findUserAnimalMatchCandidates(Gender.FEMALE, Status.SUBMITTED);    // 제출한 여성 사용자의 id와 동물상, 선호하는 동물상 데이터를 가져온다.
+        List<UserAnimalMatchCandidate> maleUser = userMatchRepository
+                .findUserAnimalMatchCandidates(Gender.MALE, Status.SUBMITTED);      // 제출한 남성 사용자의 id와 동물상, 선호하는 동물상 데이터를 가져온다.
+        List<UserAnimalMatchCandidate> femaleUser = userMatchRepository
+                .findUserAnimalMatchCandidates(Gender.FEMALE, Status.SUBMITTED);    // 제출한 여성 사용자의 id와 동물상, 선호하는 동물상 데이터를 가져온다.
         boolean[][] isVisit = new boolean[maleUserIdIndex.size()][femaleUserIdIndex.size()];   // scoreBoard 방문 여부 체크
 
         if (maleUser.isEmpty())
@@ -156,6 +156,29 @@ public class MatchService {
      * calculateInterestScore
      * <p>
      * 개별로 점수를 계산한다.(Interest : 개당 10점 총 30점)
+     * <p>
+     * 주의! : 해당 로직에선 사용자가 관심사를 얼마나 선택했는지 검증하는 과정을 포함하지 않는다.
+     * 전제 : 한 사용자에 대해, DB에 저장된 USER_INTERST는 3개씩 저장되어 있다고 가정한다.
+     * 문제 상황
+     * 따로 검증 구현 하기 위해 DB내부에서 다음과 같은 로직을 사용한다.
+     * 1. 사용자를 성별로 두 그룹을 나눈다.
+     * 2. 각 그룹과 USER_INTEREST간 JOIN연산 수행한다.
+     * 3. 두 그룹간 interest_id를 기준으로 JOIN연산을 수행한다.
+     * 이후 가져온 결과에 대해 개수를 체크해서 검증하는 과정을 수행하고자 했다.
+     * 그러나 JPQL에선 서브 쿼리 수행이 불가능하기에(나눈 그룹 각각 관심사와 JOIN연산 불가능)하기에 해당 부분은 보류하기로 했다.
+     * <p>
+     * 일관성 처리
+     * 경우 1
+     * 상황 : 만일 인덱스 생성 전 (maleUserIdIndex, femaleUserIdIndex) 데이터가 추가 될 경우
+     * 대처 : 만일 인덱스에 없는 데이터가 존재하면, null로 반환할테니 continue로 건너띈다.
+     * 결국 index 생성 시점을 기준으로 일관성을 유지한다.
+     * 경우 2
+     * 상황 : 만일 기존 데이터가 수정되었을 경우
+     * 대처 : 속성값이 null인지 확인하며 사용한다.
+     * index 생성 시점 이후에 발생할 수 있는 문제에 대처할 수 있다.
+     * <p>
+     * 역순에 대한 처리 : 만일 순서가 뒤바뀌어도 로직이 제대로 작동하도록 구현하였다.
+     * "+="연산으로 점수가 중첩되도록 하였다.
      *
      * @param scoreBoard        사용자간 점수 인접 리스트
      * @param maleUserIdIndex   남성 사용자 ID 인덱스
@@ -163,6 +186,34 @@ public class MatchService {
      * @return 관심사 점수가 반영된 사용자간 점수 인접 리스트
      */
     private int[][] calculateInterestScore(int[][] scoreBoard, Map<Long, Integer> maleUserIdIndex, Map<Long, Integer> femaleUserIdIndex) {
+        List<UserInterestMatchCandidate> maleUserList = userMatchRepository
+                .findUserInterestMatchCandidates(Gender.MALE, Status.SUBMITTED);    // 제출한 남성 사용자의 id와 관심사 데이터를 가져온다.
+        List<UserInterestMatchCandidate> femaleUserList = userMatchRepository
+                .findUserInterestMatchCandidates(Gender.FEMALE, Status.SUBMITTED);  // 제출한 여성 사용자의 id와 관심사 데이터를 가져온다.
+
+        if (maleUserList.isEmpty()) throw new GeneralException(
+                MatchErrorCode.MALE_USER_INTEREST_MATCH_CANDIDATE);     // 관심사 매칭 점수 계산 전 남성 사용자 후보 리스트를 검증한다.
+        if (femaleUserList.isEmpty()) throw new GeneralException(
+                MatchErrorCode.FEMALE_USER_INTEREST_MATCH_CANDIDATE);   // 관심사 매칭 점수 계산 전 여성 사용자 후보 리스트를 검증한다.
+
+        Set<UserInterestMatchCandidate> maleUserSet = new HashSet<>(maleUserList);      // 중복 제거를 위해, 남성 사용자: List -> Set으로 변환한다.
+        Set<UserInterestMatchCandidate> femaleUserSet = new HashSet<>(femaleUserList);  // 중복 제거를 위해, 여성 사용자: List -> Set으로 변환한다.
+
+        for (UserInterestMatchCandidate m : maleUserSet) {
+            if (m == null) continue; // 일관성(경우 1) 지켜주기 위한 코드
+            for (UserInterestMatchCandidate f : femaleUserSet) {
+                if (f == null) continue;    // 일관성(경우 1) 지켜주기 위한 코드
+
+                Integer mIndex = maleUserIdIndex.get(m.userId());
+                Integer fIndex = femaleUserIdIndex.get(f.userId());
+                if (mIndex == null || fIndex == null) continue; // 일관성(경우 2) 지켜주기 위한 코드
+
+                if (m.interestId().equals(f.interestId())) {
+                    scoreBoard[mIndex][fIndex] += 10;
+                }
+            }
+        }
+
         return scoreBoard;
     }
 
