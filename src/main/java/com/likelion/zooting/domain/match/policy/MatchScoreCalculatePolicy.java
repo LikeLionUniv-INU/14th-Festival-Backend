@@ -29,6 +29,15 @@ import java.util.Map;
  * <li><b>여성 전용:</b> 토끼, 사슴, 병아리</li>
  * <li><b>상관없음 처리:</b> {@link UserMatchRepository#findUserAnimalMatchCandidates} 로직을 참조하십시오.</li>
  * </ul>
+ *
+ * <p><b>4. 확장성 및 정책 적용 원칙</b></p>
+ * <ul>
+ * <li><b>점수 누적 방식:</b> 각 정책은 독립적인 가중치를 가지며, {@code +=} 연산을 통해 최종 점수에 누적 합산됩니다.</li>
+ * <li><b>순서 의존성(Ordering):</b> 본 정책은 필터링 조건(0점 처리 시 제외)을 포함하므로 정책의 적용 순서가 중요합니다.
+ * 특정 필터 정책에서 0점이 확정될 경우, 이후 정책의 점수 합산과 관계없이 최종 매칭 후보에서 제외될 수 있습니다.</li>
+ * <li><b>전략적 배치:</b> 연산 효율성을 위해 필터링 강도가 높거나 우선순위가 높은 정책을 먼저 배치하는 것을 권장합니다.</li>
+ * <li><b>배치 순서:</b> 동물상 -> 관심사 -> 영화 장르</li>
+ * </ul>
  */
 public interface MatchScoreCalculatePolicy {
     /**
@@ -37,17 +46,15 @@ public interface MatchScoreCalculatePolicy {
      * <p><b>[점수 산정 로직]</b></p>
      * <ul>
      * <li>점수는 60점 또는 0점으로 이분 처리하며, 하나라도 일치할 경우 만점을 부여합니다.</li>
+     * <li>만일 최종 점수가 30점 경우(한 방향만 일치할 경우), 0점 처리합니다.</li>
      * </ul>
      *
      * <p><b>[데이터 무결성 및 일관성 처리]</b></p>
      * <ul>
      * <li><b>Case 1 (데이터 신규 추가):</b> 인덱스 생성 시점 이후 추가된 데이터는 Map에서 null을 반환하므로 continue로 제외하여 일관성을 유지합니다.</li>
      * <li><b>Case 2 (데이터 수정):</b> 속성값의 null 여부를 체크하여 생성 시점 이후의 수정 사항으로 인한 런타임 에러를 방지합니다.</li>
+     * <li><b>Case 3 (점수의 원자성 유지):</b> 해당 정책은 이분적(Binary) 구조를 가집니다. 조건 충족 여부에 따라 점수는 중첩되지 않고 0점 혹은 60점 중 하나의 값만을 가집니다.</li>
      * </ul>
-     *
-     * <p><b>[확장성 및 유연성]</b></p>
-     * 정책 적용 순서가 바뀌어도 안전하게 작동하도록 구현되었습니다.
-     * {@code isVisit} 배열을 통해 중복 계산을 방지하며, {@code +=} 연산을 통해 타 정책과의 점수 중첩을 지원합니다.
      *
      * @param scoreBoard        사용자 간 점수 인접 리스트
      * @param maleUserIdIndex   남성 사용자 ID 인덱스 Map
@@ -77,9 +84,6 @@ public interface MatchScoreCalculatePolicy {
      * <li><b>Case 2 (수정 데이터):</b> 속성값의 null 체크를 통해 생성 시점 이후 발생할 수 있는 데이터 변경에 대처합니다.</li>
      * </ul>
      *
-     * <p><b>[확장성]</b></p>
-     * 정책 적용 순서와 관계없이 독립적으로 작동하며, {@code +=} 연산을 통해 점수가 누적됩니다.
-     *
      * @param scoreBoard        사용자 간 점수 인접 리스트
      * @param maleUserIdIndex   남성 사용자 ID 인덱스 Map
      * @param femaleUserIdIndex 여성 사용자 ID 인덱스 Map
@@ -104,9 +108,6 @@ public interface MatchScoreCalculatePolicy {
      * <li><b>인덱스 기준 일관성:</b> 인덱스에 존재하지 않는 사용자 데이터는 {@code continue}로 제외하여 처리 시점의 정합성을 보장합니다.</li>
      * <li><b>런타임 안정성:</b> 각 속성값의 null 여부를 확인하여 데이터 수정으로 인한 오류를 방지합니다.</li>
      * </ul>
-     *
-     * <p><b>[확장성]</b></p>
-     * 정책 독립성을 보장하며, {@code +=} 연산으로 타 정책의 점수 결과와 병합됩니다.
      *
      * @param scoreBoard        사용자 간 점수 인접 리스트
      * @param maleUserIdIndex   남성 사용자 ID 인덱스 Map
