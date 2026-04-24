@@ -18,7 +18,9 @@ public enum MatchErrorCode implements BaseErrorCode {
     MALE_USER_ANIMAL_MATCH_CANDIDATE("MATCH_004", "동물상 점수 계산을 위한 매칭 대기 리스트에 남성 사용자 정보가 없습니다.", HttpStatus.INTERNAL_SERVER_ERROR),
     FEMALE_USER_ANIMAL_MATCH_CANDIDATE("MATCH_005", "동물상 점수 계산을 위한 매칭 대기 리스트에 여성 사용자 정보가 없습니다.", HttpStatus.INTERNAL_SERVER_ERROR),
     MALE_USER_INTEREST_MATCH_CANDIDATE("MATCH_006", "관심사 점수 계산을 위한 매칭 대기 리스트에 남성 사용자 정보가 없습니다.", HttpStatus.INTERNAL_SERVER_ERROR),
-    FEMALE_USER_INTEREST_MATCH_CANDIDATE("MATCH_007", "관심사 점수 계산을 위한 매칭 대기 리스트에 여성 사용자 정보가 없습니다.", HttpStatus.INTERNAL_SERVER_ERROR)
+    FEMALE_USER_INTEREST_MATCH_CANDIDATE("MATCH_007", "관심사 점수 계산을 위한 매칭 대기 리스트에 여성 사용자 정보가 없습니다.", HttpStatus.INTERNAL_SERVER_ERROR),
+    MALE_USER_MOVIE_GENRE_MATCH_CANDIDATE("MATCH_008", "영화 장르 점수 계산을 위한 매칭 대기 리스트에 남성 사용자 정보가 없습니다.", HttpStatus.INTERNAL_SERVER_ERROR),
+    FEMALE_USER_MOVIE_GENRE_MATCH_CANDIDATE("MATCH_009", "영화 장르 계산을 위한 매칭 대기 리스트에 여성 사용자 정보가 없습니다.", HttpStatus.INTERNAL_SERVER_ERROR)
     ;
 
     private final String code;
