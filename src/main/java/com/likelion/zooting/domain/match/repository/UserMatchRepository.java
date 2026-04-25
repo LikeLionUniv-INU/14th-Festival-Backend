@@ -39,9 +39,9 @@ public interface UserMatchRepository extends JpaRepository<User, Long> {
             SELECT new com.likelion.zooting.domain.match.repository.data.UserAnimalMatchCandidate(
                         u.userId,
                         u.animalType.animalTypeId,
-                        uat.animalType.animalTypeId
+                        upat.animalType.animalTypeId
                         )
-            FROM User u INNER JOIN UserAnimalType uat ON u.userId = uat.user.userId
+            FROM User u INNER JOIN UserPreferredAnimalType upat ON u.userId = upat.user.userId
             WHERE u.gender = :gender AND u.status = :status
             """)
     List<UserAnimalMatchCandidate> findUserAnimalMatchCandidates(@Param("gender") Gender gender, @Param("status") Status status);

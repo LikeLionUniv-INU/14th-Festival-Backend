@@ -14,4 +14,10 @@ public class Interest {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "INTEREST_ID")
     private Long interestId;
+
+    @Column(name = "INTEREST_NAME", length = 30)
+    private String interestName;
+
+    @Column(name = "TAG", length = 30)
+    private String tag;
 }

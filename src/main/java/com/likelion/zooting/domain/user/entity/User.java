@@ -9,36 +9,37 @@ import java.time.LocalDateTime;
 @Entity
 @Getter
 @Setter
+@Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)  // JPA만 접근 가능
 @AllArgsConstructor
 @Table(name = "USER")
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "user_id")
+    @Column(name = "USER_ID")
     private Long userId;
 
     @ManyToOne(fetch = FetchType.LAZY)  // 최적화를 위해 ANIMAL_TYPE을 DB에서 가져오지 않도록 설정
-    @JoinColumn(name = "animal_type_id")    // 외래키 설정
+    @JoinColumn(name = "ANIMAL_TYPE_ID")    // 외래키 설정
     private AnimalType animalType;  // DB로 저장될 땐 PK로 저장되지만, Entity로 가져오므로 animalType으로 지었다.
 
-    @Column(name = "instagramId", length = 50)
-    private String instagramId;
+    @Column(name = "INSTAGRAM_ID", length = 50)
+    private String instagramId; // 인스타 아이디
 
-    @Column(name = "user_pw", length = 255)
-    private String UserPw;
-
-    @Enumerated(EnumType.STRING)    // 데이터 안정성을 위해, DB에 저장할 경우 문자열로 저장할 것을 명시
-    @Column(name = "gender", length = 10)
-    private Gender gender;
+    @Column(name = "USER_PW", length = 255)
+    private String userPw;  // 사용자 PW
 
     @Enumerated(EnumType.STRING)    // 데이터 안정성을 위해, DB에 저장할 경우 문자열로 저장할 것을 명시
-    @Column(name = "status", length = 10)
-    private Status status;
+    @Column(name = "GENDER", length = 10)
+    private Gender gender;  // 성멸
 
-    @Column(name = "is_complete", nullable = false) // null값 금지
-    private boolean isComplete;
+    @Enumerated(EnumType.STRING)    // 데이터 안정성을 위해, DB에 저장할 경우 문자열로 저장할 것을 명시
+    @Column(name = "STATUS", length = 10)
+    private Status status;  // 처리 상태
 
-    @Column(name = "created_at", updatable = false) // 수정 못하게 설정
-    private LocalDateTime createdAt;
+    @Column(name = "CREATED_AT", updatable = false) // 수정 못하게 설정
+    private LocalDateTime createdAt;    // 생성 시간
+
+    @Column(name = "PRIVACY_CONSENT")
+    private boolean privacyConsent; // 개인정보 동의 여부
 }

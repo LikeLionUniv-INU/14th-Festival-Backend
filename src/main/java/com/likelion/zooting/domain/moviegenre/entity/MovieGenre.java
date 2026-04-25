@@ -12,6 +12,10 @@ import lombok.*;
 public class MovieGenre {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "movie_genre_id")
+    @Column(name = "MOVIE_GENRE_ID")
     private Long movieGenreId;
+
+    @Column(name = "MOVIE_GENRE_NAME", length = 30)
+    private String movieGenreName;  // 영화 장르 이름
+
 }

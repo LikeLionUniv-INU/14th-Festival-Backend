@@ -14,14 +14,14 @@ import lombok.*;
 public class UserInterest {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "user_interest_id")
+    @Column(name = "USER_INTEREST_ID")
     private Long userInterestId;
 
     @ManyToOne(fetch = FetchType.LAZY)  // 최적화를 위해 USER을 DB에서 가져오지 않도록 설정
-    @JoinColumn(name = "user_id")   // 외래키 설정
+    @JoinColumn(name = "USER_ID")   // 외래키 설정
     private User user;  // DB로 저장될 땐 PK로 저장되지만, Entity로 가져오므로 user로 지었다.
 
     @ManyToOne(fetch = FetchType.LAZY)  // 최적화를 위해 INTEREST를 DB에서 가져오지 않도록 설정
-    @JoinColumn(name = "interest_id")   // 외래키 설정
+    @JoinColumn(name = "INTEREST_ID")   // 외래키 설정
     private Interest interest;  // DB로 저장될 땐 PK로 저장되지만, Entity로 가져오므로 interest로 지었다.
 }
