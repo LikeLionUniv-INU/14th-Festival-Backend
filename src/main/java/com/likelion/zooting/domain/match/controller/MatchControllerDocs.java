@@ -1,6 +1,6 @@
 package com.likelion.zooting.domain.match.controller;
 
-import com.likelion.zooting.domain.match.dto.MatchResDto;
+import com.likelion.zooting.domain.match.dto.MatchRequest;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -23,7 +23,7 @@ public interface MatchControllerDocs {
             @ApiResponse(
                     responseCode = "200",
                     description = "매칭 실행 성공",
-                    content = @Content(schema = @Schema(implementation = MatchResDto.class))
+                    content = @Content(schema = @Schema(implementation = MatchRequest.class))
             ),
             @ApiResponse(
                     responseCode = "403",
@@ -37,5 +37,5 @@ public interface MatchControllerDocs {
             )
     })
     @PostMapping("/simulate")
-    ResponseEntity<com.likelion.zooting.global.response.ApiResponse<MatchResDto>> simulateMatch();
+    ResponseEntity<com.likelion.zooting.global.response.ApiResponse<MatchRequest>> simulateMatch();
 }

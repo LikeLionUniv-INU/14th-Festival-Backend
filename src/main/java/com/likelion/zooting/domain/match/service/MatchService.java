@@ -1,6 +1,6 @@
 package com.likelion.zooting.domain.match.service;
 
-import com.likelion.zooting.domain.match.dto.MatchResDto;
+import com.likelion.zooting.domain.match.dto.MatchRequest;
 import com.likelion.zooting.domain.match.policy.MatchPolicy;
 import com.likelion.zooting.domain.match.policy.MatchScoreCalculatePolicy;
 import com.likelion.zooting.domain.match.repository.UserMatchRepository;
@@ -48,7 +48,7 @@ public class MatchService {
      * @param isSave DB 저장 여부 (true: 저장 수행, false: 시뮬레이션 결과만 반환)
      * @return 매칭 결과 통계 및 정보가 담긴 DTO
      */
-    public MatchResDto getResultOfMatching(boolean isSave) {
+    public MatchRequest getResultOfMatching(boolean isSave) {
         // 매칭 결과
         TempMatchResult simulatedMatchResult;
         LocalDateTime simulatedAt;
@@ -85,7 +85,7 @@ public class MatchService {
             // 추후 "매칭 결과 저장(확정) API" 구현 시 채울 부분
         }
 
-        return MatchResDto.builder().totalUserCount(simulatedMatchResult.totalUserCount()).matchedPairCount(simulatedMatchResult.matchedPairCount()).unmatchedUserCount(simulatedMatchResult.unmatchedUserCount()).simulatedAt(simulatedAt).build();
+        return MatchRequest.builder().totalUserCount(simulatedMatchResult.totalUserCount()).matchedPairCount(simulatedMatchResult.matchedPairCount()).unmatchedUserCount(simulatedMatchResult.unmatchedUserCount()).simulatedAt(simulatedAt).build();
     }
 
     /**
