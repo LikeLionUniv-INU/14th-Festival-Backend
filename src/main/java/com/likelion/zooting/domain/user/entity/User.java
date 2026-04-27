@@ -8,10 +8,7 @@ import java.time.LocalDateTime;
 
 @Entity
 @Getter
-@Setter
-@Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)  // JPA만 접근 가능
-@AllArgsConstructor
 @Table(name = "USER")
 public class User {
     @Id

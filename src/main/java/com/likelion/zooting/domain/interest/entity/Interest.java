@@ -5,9 +5,7 @@ import lombok.*;
 
 @Entity
 @Getter
-@Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)  // JPA만 접근 가능
-@AllArgsConstructor
 @Table(name = "INTEREST")
 public class Interest {
     @Id

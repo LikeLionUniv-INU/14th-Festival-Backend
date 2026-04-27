@@ -7,9 +7,7 @@ import lombok.*;
 
 @Entity
 @Getter
-@Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)  // JPA만 접근 가능
-@AllArgsConstructor
 @Table(name = "USER_MOVIE_GENRE")
 public class UserMovieGenre {
     @Id

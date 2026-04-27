@@ -3,6 +3,7 @@ package com.likelion.zooting.domain.match.service;
 import com.likelion.zooting.domain.match.dto.MatchRequest;
 import com.likelion.zooting.domain.match.policy.MatchPolicy;
 import com.likelion.zooting.domain.match.policy.MatchScoreCalculatePolicy;
+import com.likelion.zooting.domain.match.policy.MatchScoreType;
 import com.likelion.zooting.domain.match.repository.UserMatchRepository;
 import com.likelion.zooting.domain.match.repository.data.TempMatchResult;
 import com.likelion.zooting.domain.user.entity.Gender;
