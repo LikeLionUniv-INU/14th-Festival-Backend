@@ -1,8 +1,8 @@
 package com.likelion.zooting.domain.match.repository;
 
-import com.likelion.zooting.domain.match.repository.data.UserAnimalMatchCandidate;
-import com.likelion.zooting.domain.match.repository.data.UserInterestMatchCandidate;
-import com.likelion.zooting.domain.match.repository.data.UserMovieGenreMatchCandidate;
+import com.likelion.zooting.domain.match.dto.data.UserAnimalMatchCandidate;
+import com.likelion.zooting.domain.match.dto.data.UserInterestMatchCandidate;
+import com.likelion.zooting.domain.match.dto.data.UserMovieGenreMatchCandidate;
 import com.likelion.zooting.domain.user.entity.Gender;
 import com.likelion.zooting.domain.user.entity.Status;
 import com.likelion.zooting.domain.user.entity.User;

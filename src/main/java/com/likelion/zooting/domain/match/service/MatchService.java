@@ -1,18 +1,30 @@
 package com.likelion.zooting.domain.match.service;
 
 import com.likelion.zooting.domain.match.dto.MatchRequest;
+import com.likelion.zooting.domain.match.dto.data.UserAnimalMatchCandidate;
+import com.likelion.zooting.domain.match.dto.data.UserInterestMatchCandidate;
+import com.likelion.zooting.domain.match.dto.data.UserMovieGenreMatchCandidate;
+import com.likelion.zooting.domain.match.mapper.MatchMapper;
 import com.likelion.zooting.domain.match.policy.MatchPolicy;
 import com.likelion.zooting.domain.match.policy.MatchScoreCalculatePolicy;
 import com.likelion.zooting.domain.match.policy.MatchScoreType;
-import com.likelion.zooting.domain.match.repository.UserMatchRepository;
-import com.likelion.zooting.domain.match.repository.data.TempMatchResult;
+import com.likelion.zooting.domain.match.dto.data.TempMatchResult;
 import com.likelion.zooting.domain.user.entity.Gender;
 import com.likelion.zooting.domain.user.entity.Status;
+import com.likelion.zooting.domain.user.entity.User;
+import com.likelion.zooting.domain.user.repository.UserRepository;
+import com.likelion.zooting.domain.userinterest.entity.UserInterest;
+import com.likelion.zooting.domain.userinterest.repository.UserInterestRepository;
+import com.likelion.zooting.domain.usermoviegenre.entity.UserMovieGenre;
+import com.likelion.zooting.domain.usermoviegenre.repository.UserMovieGenreRepository;
+import com.likelion.zooting.domain.userpreferredanimaltype.UserPreferredAnimalTypeRepository;
+import com.likelion.zooting.domain.userpreferredanimaltype.entity.UserPreferredAnimalType;
 import com.likelion.zooting.global.exception.GeneralException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -22,9 +34,15 @@ import java.util.stream.IntStream;
 @Service
 @RequiredArgsConstructor    // final 필드의 생성자 자동 생성
 public class MatchService {
-    private final UserMatchRepository userMatchRepository;
     private final MatchPolicy matchPolicy;
     private final MatchScoreCalculatePolicy matchScoreCalculatePolicy;
+
+    private final UserRepository userRepository;
+    private final UserPreferredAnimalTypeRepository userPreferredAnimalTypeRepository;
+    private final UserInterestRepository userInterestRepository;
+    private final UserMovieGenreRepository userMovieGenreRepository;
+
+    private final MatchMapper matchMapper;
 
     /**
      * 매칭 시뮬레이션을 수행하고 최종 결과를 반환합니다.
@@ -46,6 +64,13 @@ public class MatchService {
      * <li><b>시간 기록:</b> 유저 ID 인덱싱 직후를 기준으로 한 매칭 시작 시간</li>
      * </ul>
      *
+     * <p><b>[해당 로직의 전제조건]</b></p>
+     * 본 로직은 대량의데이터를 효율적으로 처리하기 위해 사전 검증된 데이터만을 입력 값으로 받는것을 원칙으로 합니다.
+     * <ul>
+     * <li><b>전제 1. 데이터 넣을때, 개수에 맞게 넣음 :</b> 따로 사용자별 선호 동물상, 관심사, 영화 장르 선택 개수를 체크하지 않습니다.</li>
+     * <li><b>전제 2. 과거의 데이터 사용하지 않음 :</b> 18:00시 이후 모든 데이터를 비운다는 가정하에, 정합성이 무너지지 않는다는 전제로 실행됩니다.</li>
+     * </ul>
+     *
      * @param isSave DB 저장 여부 (true: 저장 수행, false: 시뮬레이션 결과만 반환)
      * @return 매칭 결과 통계 및 정보가 담긴 DTO
      */
@@ -54,29 +79,63 @@ public class MatchService {
         TempMatchResult simulatedMatchResult;
         LocalDateTime simulatedAt;
 
-        // 남성 사용자 id와 여성 사용자 id에 대한 인덱스
-        List<Long> maleUserIdList = userMatchRepository.findByGenderAndStatus(Gender.MALE, Status.SUBMITTED);
-        List<Long> femaleUserIdList = userMatchRepository.findByGenderAndStatus(Gender.FEMALE, Status.SUBMITTED);
 
-        checkValidate(maleUserIdList, MatchScoreType.MALE_USER_ID);     // DB에서 가져온 남성 사용자 id list 검정
-        checkValidate(femaleUserIdList, MatchScoreType.FEMALE_USER_ID); // DB에서 가져온 여성 사용자 id list 검정
+        // repository에서 사용자 데이터 가져오기
+        List<User> maleUsers = userRepository.findByGenderAndStatus(Gender.MALE, Status.SUBMITTED);
+        List<User> femaleUsers = userRepository.findByGenderAndStatus(Gender.FEMALE, Status.SUBMITTED);
+        // 검정
+        checkValidate(maleUsers, MatchScoreType.MALE_USER_ID);
+        checkValidate(femaleUsers, MatchScoreType.FEMALE_USER_ID);
 
-        Map<Long, Integer> maleUserIdIndex = IntStream.range(0, maleUserIdList.size()).boxed().collect(Collectors.toMap(i -> maleUserIdList.get(i), i -> i));
-        Map<Long, Integer> femaleUserIdIndex = IntStream.range(0, femaleUserIdList.size()).boxed().collect(Collectors.toMap(i -> femaleUserIdList.get(i), i -> i));
+        // repository에서 사용자 관련 데이터(선호 동물상, 관심사, 영화 장르) 가져오기
+        List<UserPreferredAnimalType> userPreferredAnimalTypes = userPreferredAnimalTypeRepository.findAll();
+        List<UserInterest> userInterests = userInterestRepository.findAll();
+        List<UserMovieGenre> userMovieGenres = userMovieGenreRepository.findAll();
+        // 검정
+        checkValidate(userPreferredAnimalTypes, MatchScoreType.PREFERRED_ANiMAL_ID);
+        checkValidate(userInterests, MatchScoreType.INTEREST_ID);
+        checkValidate(userMovieGenres, MatchScoreType.MOVIE_ID);
+
+        // 사용자 ID -> index
+        // 다른 데이터의 유입은 없으며, 사용자에 대한 검정은 거쳤으므로 해당 검정 과정은 넘어간다.
+        Map<Long, Integer> maleUserIdToIndex = getUserIdToIndex(maleUsers);
+        Map<Long, Integer> femaleUserIdToIndex = getUserIdToIndex(femaleUsers);
+
+        // index -> 사용자 ID
+        // 다른 데이터의 유입은 없으며, 사용자에 대한 검정은 거쳤으므로 해당 검정 과정은 넘어간다.
+        Map<Integer, Long> indexToMaleUserId = getIndexToUserId(maleUsers);
+        Map<Integer, Long> indexToFemaleUserId = getIndexToUserId(femaleUsers);
+
+        // 동물상과 관심 동물상, 사용자를 매핑한 리스트
+        List<UserAnimalMatchCandidate> maleUserAnimalMatchCandidates = getUserAnimalMatchCandidates(maleUsers, userPreferredAnimalTypes);
+        List<UserAnimalMatchCandidate> femaleUserAnimalMatchCandidates = getUserAnimalMatchCandidates(femaleUsers, userPreferredAnimalTypes);
+        // 검정
+        checkValidate(maleUserAnimalMatchCandidates, MatchScoreType.MALE_PREFERRED_ANiMAL_ID);
+        checkValidate(femaleUserAnimalMatchCandidates, MatchScoreType.FEMALE_PREFERRED_ANiMAL_ID);
+
+        // 관심사와 사용자 매핑한 리스트
+        List<UserInterestMatchCandidate> maleUserInterestMatchCandidates = getUserInterestMatchCandidates(maleUsers, userInterests);
+        List<UserInterestMatchCandidate> femaleUserInterestMatchCandidates = getUserInterestMatchCandidates(femaleUsers, userInterests);
+        // 검정
+        checkValidate(maleUserInterestMatchCandidates, MatchScoreType.MALE_INTEREST_ID);
+        checkValidate(femaleUserInterestMatchCandidates, MatchScoreType.FEMALE_INTEREST_ID);
+
+        // 영화 장르와 사용자 매핑한 리스트
+        List<UserMovieGenreMatchCandidate> maleUserMovieGenreMatchCandidates = getUserMovieGenreMatchCandidates(maleUsers, userMovieGenres);
+        List<UserMovieGenreMatchCandidate> femaleUserMovieGenreMatchCandidates = getUserMovieGenreMatchCandidates(femaleUsers, userMovieGenres);
+        // 검정
+        checkValidate(maleUserMovieGenreMatchCandidates, MatchScoreType.MALE_MOVIE_ID);
+        checkValidate(femaleUserMovieGenreMatchCandidates, MatchScoreType.FEMALE_MOVIE_ID);
 
         simulatedAt = LocalDateTime.now();  // 매칭 시작 시간
 
         // user간 점수 인접 리스트 초기화
-        int[][] scoreBoard = new int[maleUserIdList.size()][femaleUserIdList.size()];
+        int[][] scoreBoard = new int[maleUsers.size()][femaleUsers.size()];
 
         // 점수 계산
-        scoreBoard = matchScoreCalculatePolicy.calculateAnimalTypeScore(scoreBoard, maleUserIdIndex, femaleUserIdIndex);
-        scoreBoard = matchScoreCalculatePolicy.calculateInterestScore(scoreBoard, maleUserIdIndex, femaleUserIdIndex);
-        scoreBoard = matchScoreCalculatePolicy.calculateMovieGenreScore(scoreBoard, maleUserIdIndex, femaleUserIdIndex);
-
-        // index(key) -> ID(value)로 바꾸기
-        Map<Integer, Long> indexToMaleUserId = maleUserIdIndex.entrySet().stream().collect(Collectors.toMap(entry -> entry.getValue(), entry -> entry.getKey()));
-        Map<Integer, Long> indexToFemaleUserId = femaleUserIdIndex.entrySet().stream().collect(Collectors.toMap(entry -> entry.getValue(), entry -> entry.getKey()));
+        scoreBoard = matchScoreCalculatePolicy.calculateAnimalTypeScore(scoreBoard, maleUserIdToIndex, femaleUserIdToIndex, maleUserAnimalMatchCandidates, femaleUserAnimalMatchCandidates);
+        scoreBoard = matchScoreCalculatePolicy.calculateInterestScore(scoreBoard, maleUserIdToIndex, femaleUserIdToIndex, maleUserInterestMatchCandidates, femaleUserInterestMatchCandidates);
+        scoreBoard = matchScoreCalculatePolicy.calculateMovieGenreScore(scoreBoard, maleUserIdToIndex, femaleUserIdToIndex, maleUserMovieGenreMatchCandidates, femaleUserMovieGenreMatchCandidates);
 
         // 매칭 (greedy algorithm)
         simulatedMatchResult = matchPolicy.simulateMatching(scoreBoard, indexToMaleUserId, indexToFemaleUserId);
@@ -87,6 +146,53 @@ public class MatchService {
         }
 
         return MatchRequest.builder().totalUserCount(simulatedMatchResult.totalUserCount()).matchedPairCount(simulatedMatchResult.matchedPairCount()).unmatchedUserCount(simulatedMatchResult.unmatchedUserCount()).simulatedAt(simulatedAt).build();
+    }
+
+    private Map<Long, Integer> getUserIdToIndex(List<User> users) {
+        return IntStream.range(0, users.size()).boxed().collect(Collectors.toMap(i -> users.get(i).getUserId(), i -> i));
+    }
+
+    private Map<Integer, Long> getIndexToUserId(List<User> users) {
+        return IntStream.range(0, users.size()).boxed().collect(Collectors.toMap(i -> i, i -> users.get(i).getUserId()));
+    }
+
+    private List<UserAnimalMatchCandidate> getUserAnimalMatchCandidates(List<User> users, List<UserPreferredAnimalType> preferredAnimalTypes) {
+        List<UserAnimalMatchCandidate> results = new ArrayList<>();
+        for (User u : users) {
+            for (UserPreferredAnimalType upa : preferredAnimalTypes) {
+                if (upa.getUser().equals(u)) {
+                    results.add(matchMapper.mapToUserAnimalMatchCandidate(u, upa));
+                }
+            }
+        }
+
+        return results;
+    }
+
+    private List<UserInterestMatchCandidate> getUserInterestMatchCandidates(List<User> users, List<UserInterest> userInterests) {
+        List<UserInterestMatchCandidate> results = new ArrayList<>();
+        for (User u : users) {
+            for (UserInterest ui : userInterests) {
+                if (ui.getUser().equals(u)) {
+                    results.add(matchMapper.mapToUserInterestMatchCandidate(u, ui));
+                }
+            }
+        }
+
+        return results;
+    }
+
+    private List<UserMovieGenreMatchCandidate> getUserMovieGenreMatchCandidates(List<User> users, List<UserMovieGenre> userMovieGenres) {
+        List<UserMovieGenreMatchCandidate> results = new ArrayList<>();
+        for (User u : users) {
+            for (UserMovieGenre umg : userMovieGenres) {
+                if (umg.getUser().equals(u)) {
+                    results.add(matchMapper.mapToUserMovieGenreMatchCandidate(u, umg));
+                }
+            }
+        }
+
+        return results;
     }
 
     /**

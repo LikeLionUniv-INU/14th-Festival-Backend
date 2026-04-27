@@ -1,7 +1,15 @@
-package com.likelion.zooting.domain.match.repository.data;
+package com.likelion.zooting.domain.match.dto.data;
 
 import java.util.List;
 
+/**
+ *
+ *
+ * @param totalUserCount
+ * @param matchedPairCount
+ * @param unmatchedUserCount
+ * @param finalMatchedPairList
+ */
 public record TempMatchResult(
         Integer totalUserCount,     // 매칭에 적용된 전체 사용자 수
         Integer matchedPairCount,   // 매칭된 짝의 개수

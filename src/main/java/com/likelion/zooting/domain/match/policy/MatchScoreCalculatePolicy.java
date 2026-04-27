@@ -1,7 +1,11 @@
 package com.likelion.zooting.domain.match.policy;
 
+import com.likelion.zooting.domain.match.dto.data.UserAnimalMatchCandidate;
+import com.likelion.zooting.domain.match.dto.data.UserInterestMatchCandidate;
+import com.likelion.zooting.domain.match.dto.data.UserMovieGenreMatchCandidate;
 import com.likelion.zooting.domain.match.repository.UserMatchRepository;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -52,7 +56,11 @@ public interface MatchScoreCalculatePolicy {
      * @param femaleUserIdIndex 여성 사용자 ID 인덱스 Map
      * @return 동물상 점수가 반영된 scoreBoard
      */
-    int[][] calculateAnimalTypeScore(int[][] scoreBoard, Map<Long, Integer> maleUserIdIndex, Map<Long, Integer> femaleUserIdIndex);
+    int[][] calculateAnimalTypeScore(int[][] scoreBoard,
+                                     Map<Long, Integer> maleUserIdIndex,
+                                     Map<Long, Integer> femaleUserIdIndex,
+                                     List<UserAnimalMatchCandidate> maleUserAnimalMatchCandidates,
+                                     List<UserAnimalMatchCandidate> femaleUserAnimalMatchCandidates);
 
     /**
      * 공통 관심사 일치 여부에 따른 매칭 점수를 계산합니다.
@@ -79,7 +87,11 @@ public interface MatchScoreCalculatePolicy {
      * @param femaleUserIdIndex 여성 사용자 ID 인덱스 Map
      * @return 관심사 점수가 반영된 scoreBoard
      */
-    int[][] calculateInterestScore(int[][] scoreBoard, Map<Long, Integer> maleUserIdIndex, Map<Long, Integer> femaleUserIdIndex);
+    int[][] calculateInterestScore(int[][] scoreBoard,
+                                   Map<Long, Integer> maleUserIdIndex,
+                                   Map<Long, Integer> femaleUserIdIndex,
+                                   List<UserInterestMatchCandidate> maleUserInterestMatchCandidates,
+                                   List<UserInterestMatchCandidate> femaleUserInterestMatchCandidates);
 
     /**
      * 선호 영화 장르 일치 여부에 따른 매칭 점수를 계산합니다.
@@ -103,5 +115,9 @@ public interface MatchScoreCalculatePolicy {
      * @param femaleUserIdIndex 여성 사용자 ID 인덱스 Map
      * @return 영화 장르 점수가 반영된 scoreBoard
      */
-    int[][] calculateMovieGenreScore(int[][] scoreBoard, Map<Long, Integer> maleUserIdIndex, Map<Long, Integer> femaleUserIdIndex);
+    int[][] calculateMovieGenreScore(int[][] scoreBoard,
+                                     Map<Long, Integer> maleUserIdIndex,
+                                     Map<Long, Integer> femaleUserIdIndex,
+                                     List<UserMovieGenreMatchCandidate> maleUserMovieGenreMatchCandidates,
+                                     List<UserMovieGenreMatchCandidate> femaleUserMovieGenreMatchCandidates);
 }
