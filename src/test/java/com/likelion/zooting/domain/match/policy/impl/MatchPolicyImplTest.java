@@ -2,38 +2,21 @@ package com.likelion.zooting.domain.match.policy.impl;
 
 import com.likelion.zooting.domain.match.repository.UserMatchRepository;
 import com.likelion.zooting.domain.match.repository.data.UserAnimalMatchCandidate;
-import com.likelion.zooting.domain.match.service.MatchService;
+import com.likelion.zooting.domain.match.repository.data.UserInterestMatchCandidate;
 import com.likelion.zooting.domain.user.entity.Gender;
 import com.likelion.zooting.domain.user.entity.Status;
-import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
 import static org.mockito.Mockito.when;
 
-/**
- * - UserAnimalMatchCandidate {Long userId, Long AnimalTypeId, Long preferredAnimalTypeId}
- * 남성
- * m1 : {11L, 1L, 2L}, {11L, 1L, 8L}, {11L, 1L, 9L}
- * m2 : {12L, 1L, 3L}, {12L, 1L, 7L}, {12L, 1L, 9L}
- * m3 : {13L, 4L, 1L}, {13L, 4L, 8L}, {13L, 4L, 9L}
- * 여성
- * f1 : {23L, 3L, 1L}, {23L, 3L, 4L}, {23L, 3L, 5L}
- * f2 : {21L, 8L, 1L}, {21L, 8L, 5L}, {21L, 8L, 6L}
- * f3 : {22L, 9L, 4L}, {22L, 9L, 5L}, {22L, 9L, 6L}
- * - 동물 타입 AnimalType
- * 공통 ID : 1, 2, 3
- * 남성 ID : 4, 5, 6
- * 여성 ID : 7, 8, 9
- */
 @ExtendWith(MockitoExtension.class)
 class MatchPolicyImplTest {
     @Mock
@@ -41,6 +24,21 @@ class MatchPolicyImplTest {
     @InjectMocks
     private MatchScoreCaculatePolicyImpl matchScoreCaculatePolicy;
 
+    /**
+     * - UserAnimalMatchCandidate {Long userId, Long AnimalTypeId, Long preferredAnimalTypeId}
+     * 남성
+     * m1 : {11L, 1L, 2L}, {11L, 1L, 8L}, {11L, 1L, 9L}
+     * m2 : {12L, 1L, 3L}, {12L, 1L, 7L}, {12L, 1L, 9L}
+     * m3 : {13L, 4L, 1L}, {13L, 4L, 8L}, {13L, 4L, 9L}
+     * 여성
+     * f1 : {23L, 3L, 1L}, {23L, 3L, 4L}, {23L, 3L, 5L}
+     * f2 : {21L, 8L, 1L}, {21L, 8L, 5L}, {21L, 8L, 6L}
+     * f3 : {22L, 9L, 4L}, {22L, 9L, 5L}, {22L, 9L, 6L}
+     * - 동물 타입 ID
+     * 공통 ID : 1, 2, 3
+     * 남성 ID : 4, 5, 6
+     * 여성 ID : 7, 8, 9
+     */
     @Test
     void testCalculateAnimalTypeScore() {
         // 사용자의 동물상 및 선호 동물상 리스트 생성
@@ -84,4 +82,82 @@ class MatchPolicyImplTest {
         System.out.println(Arrays.deepToString(result));
     }
 
+    /**
+     * - UserInterestMatchCandidates {Long useId, Long interestId}
+     * 남성
+     * m1 : {11L, 2L}, {11L, 4L}, {11L, 8L}
+     * m2 : {12L, 3L}, {12L, 6L}, {12L, 9L}
+     * m3 : {13L, 1L}, {13L, 6L}, {13L, 8L}
+     * 여성
+     * f1 : {23L, 1L}, {23L, 2L}, {23L, 3L}
+     * f2 : {21L, 5L}, {21L, 7L}, {21L, 9L},
+     * f3 : {22L, 2L}, {22L, 7L}, {22L, 8L},
+     * - 관심사 ID
+     * 1, 2, 3, 4, 5, 6, 7, 8, 9
+     */
+    @Test
+    void testCalculateInterestScore() {
+        // 사용자의 관심사 리스트 생성 - 남성
+        List<UserInterestMatchCandidate> maleUserInterest = List.of(
+                // m1 (11L): 2, 4, 8
+                new UserInterestMatchCandidate(11L, 2L),
+                new UserInterestMatchCandidate(11L, 4L),
+                new UserInterestMatchCandidate(11L, 8L),
+
+                // m2 (12L): 3, 6, 9
+                new UserInterestMatchCandidate(12L, 3L),
+                new UserInterestMatchCandidate(12L, 6L),
+                new UserInterestMatchCandidate(12L, 9L),
+
+                // m3 (13L): 1, 6, 8
+                new UserInterestMatchCandidate(13L, 1L),
+                new UserInterestMatchCandidate(13L, 6L),
+                new UserInterestMatchCandidate(13L, 8L)
+        );
+
+        // 사용자의 관심사 리스트 생성 - 여성
+        List<UserInterestMatchCandidate> femaleUserInterest = List.of(
+                // f1 (23L): 1, 2, 3
+                new UserInterestMatchCandidate(23L, 1L),
+                new UserInterestMatchCandidate(23L, 2L),
+                new UserInterestMatchCandidate(23L, 3L),
+
+                // f2 (21L): 5, 7, 9
+                new UserInterestMatchCandidate(21L, 5L),
+                new UserInterestMatchCandidate(21L, 7L),
+                new UserInterestMatchCandidate(21L, 9L),
+
+                // f3 (22L): 2, 7, 8
+                new UserInterestMatchCandidate(22L, 2L),
+                new UserInterestMatchCandidate(22L, 7L),
+                new UserInterestMatchCandidate(22L, 8L)
+        );
+
+        // 사용자 인덱스 생성
+        Map<Long, Integer> maleUserIdIndex = Map.of(11L, 0, 12L, 1, 13L, 2);
+        Map<Long, Integer> femaleUserIdIndex = Map.of(23L, 0, 21L, 1, 22L, 2);
+
+        // userMatchRepository가 호출될 때 반환할 값 설정
+        when(userMatchRepository.findUserInterestMatchCandidates(Gender.MALE, Status.SUBMITTED)).thenReturn(maleUserInterest);
+        when(userMatchRepository.findUserInterestMatchCandidates(Gender.FEMALE, Status.SUBMITTED)).thenReturn(femaleUserInterest);
+
+        // 빈 점수판 생성 -> 0인 값은 이전 값에서 거른 값이라 간주하기에, 100으로 채웠다.
+        int[][] scoreBoard = {
+                {100, 100, 100},
+                {100, 100, 100},
+                {100, 100, 100},
+        };
+
+        // 채워진 점수판 생성(이전 testCalculateAnimalTypeScore의 result)
+        int[][] accumulatedScoreBoard = {
+                {0, 60, 0},
+                {60, 0, 0},
+                {0, 0, 60}
+        };
+
+        int[][] resultOfScoreBoard = matchScoreCaculatePolicy.calculateInterestScore(scoreBoard, maleUserIdIndex, femaleUserIdIndex);
+        int[][] resultOfAccumulatedScoreBoard = matchScoreCaculatePolicy.calculateInterestScore(accumulatedScoreBoard, maleUserIdIndex, femaleUserIdIndex);
+        System.out.println(Arrays.deepToString(resultOfScoreBoard));
+        System.out.println(Arrays.deepToString(resultOfAccumulatedScoreBoard));
+    }
 }
