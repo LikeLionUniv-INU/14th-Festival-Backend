@@ -19,7 +19,7 @@ import java.util.Set;
 
 @Component
 @RequiredArgsConstructor
-public class MatchScoreCaculatePolicyImpl implements MatchScoreCalculatePolicy {
+public class MatchScoreCalculatePolicyImpl implements MatchScoreCalculatePolicy {
 
     private final UserMatchRepository userMatchRepository;
 

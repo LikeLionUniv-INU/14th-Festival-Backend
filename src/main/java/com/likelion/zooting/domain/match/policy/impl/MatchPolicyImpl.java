@@ -15,9 +15,14 @@ import java.util.stream.IntStream;
 public class MatchPolicyImpl implements MatchPolicy {
     @Override
     public TempMatchResult simulateMatching(int[][] scoreBoard, Map<Integer, Long> indexToMaleUserId, Map<Integer, Long> indexToFemaleUserId) {
+        // 전체 사용자 수
         Integer totalUserCount = indexToFemaleUserId.size() + indexToMaleUserId.size();
+        // 매칭된 쌍의 개수
         Integer matchedPairCount = 0;
+        // 매칭되지 않는 쌍의 개수
         Integer unmatchedUserCount = 0;
+        // 최종 매칭 쌍 리스트
+        List<TempMatch> finalMatchedPairList = new ArrayList<>();
 
         // 모든 매칭을 나열
         List<TempMatch> relations = new ArrayList<>();
@@ -25,7 +30,7 @@ public class MatchPolicyImpl implements MatchPolicy {
         for (int m = 0; m < scoreBoard.length; m++) {
             for (int f = 0; f < scoreBoard[m].length; f++) {
                 // 필터 적용
-                if (scoreBoard[m][f] == 0) {
+                if (scoreBoard[m][f] < 90) {
                     continue;
                 }
                 relations.add(new TempMatch(m, f, scoreBoard[m][f]));
@@ -44,6 +49,7 @@ public class MatchPolicyImpl implements MatchPolicy {
             if (!isVisitMaleUser[tm.maleUserIndex()] && !isVisitFemaleUser[tm.femaleUserIndex()]) {
                 isVisitMaleUser[tm.maleUserIndex()] = true;
                 isVisitFemaleUser[tm.femaleUserIndex()] = true;
+                finalMatchedPairList.add(tm);
                 matchedPairCount++;
             }
         }
@@ -52,6 +58,6 @@ public class MatchPolicyImpl implements MatchPolicy {
         unmatchedUserCount += (int) IntStream.range(0, isVisitMaleUser.length).filter(i -> !isVisitMaleUser[i]).count();
         unmatchedUserCount += (int) IntStream.range(0, isVisitFemaleUser.length).filter(i -> !isVisitFemaleUser[i]).count();
 
-        return new TempMatchResult(totalUserCount, matchedPairCount, unmatchedUserCount);
+        return new TempMatchResult(totalUserCount, matchedPairCount, unmatchedUserCount, finalMatchedPairList);
     }
 }
