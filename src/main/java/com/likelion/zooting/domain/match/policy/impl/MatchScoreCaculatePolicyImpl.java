@@ -46,11 +46,11 @@ public class MatchScoreCaculatePolicyImpl implements MatchScoreCalculatePolicy {
 
                     if (mIndex == null || fIndex == null) continue;   // Case 2(데이터 수정)를 위한 장치
 
-                    if(m.animalTypeId() == f.preferredAnimalTypeId()){  // 동물상(남성) == 선호 동물상(여성)
+                    if(m.animalTypeId().equals(f.preferredAnimalTypeId())){  // 동물상(남성) == 선호 동물상(여성)
                         maleToFemale[mIndex][fIndex] = true;
                     }
-                    if(m.preferredAnimalTypeId() == f.animalTypeId()){  // 동물상(남성) == 선호 동물상(여성)
-                        femaleToMale[fIndex][mIndex] = true;
+                    if(m.preferredAnimalTypeId().equals(f.animalTypeId())){  // 동물상(남성) == 선호 동물상(여성)
+                        femaleToMale[mIndex][fIndex] = true;
                     }
                 }
             }
