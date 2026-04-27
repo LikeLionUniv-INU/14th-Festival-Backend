@@ -143,11 +143,7 @@ class MatchPolicyImplTest {
         when(userMatchRepository.findUserInterestMatchCandidates(Gender.FEMALE, Status.SUBMITTED)).thenReturn(femaleUserInterest);
 
         // 빈 점수판 생성 -> 0인 값은 이전 값에서 거른 값이라 간주하기에, 100으로 채웠다.
-        int[][] scoreBoard = {
-                {100, 100, 100},
-                {100, 100, 100},
-                {100, 100, 100},
-        };
+        int[][] scoreBoard = new int[maleUserIdIndex.size()][femaleUserIdIndex.size()];
 
         // 채워진 점수판 생성(이전 testCalculateAnimalTypeScore의 result)
         int[][] accumulatedScoreBoard = {
@@ -215,17 +211,13 @@ class MatchPolicyImplTest {
         when(userMatchRepository.findUserMovieGenreMatchCandidate(Gender.FEMALE, Status.SUBMITTED)).thenReturn(femaleUserMovieGenre);
 
         // 빈 점수판 생성 -> 0인 값은 이전 값에서 거른 값이라 간주하기에, 100으로 채웠다.
-        int[][] scoreBoard = {
-                {100, 100, 100},
-                {100, 100, 100},
-                {100, 100, 100},
-        };
+        int[][] scoreBoard = new int[maleUserIdIndex.size()][femaleUserIdIndex.size()];
 
         // 채워진 점수판 생성(이전 testCalculateInterestScore의 result)
         int[][] accumulatedScoreBoard = {
-                {0, 0, 0},
-                {70, 0, 0},
-                {0, 0, 70}
+                {30, 60, 60},
+                {90, 30, 0},
+                {30, 0, 90}
         };
 
         int[][] resultOfScoreBoard = matchScoreCaculatePolicy.calculateMovieGenreScore(scoreBoard, maleUserIdIndex, femaleUserIdIndex);

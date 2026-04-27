@@ -46,10 +46,10 @@ public class MatchScoreCaculatePolicyImpl implements MatchScoreCalculatePolicy {
 
                     if (mIndex == null || fIndex == null) continue;   // Case 2(데이터 수정)를 위한 장치
 
-                    if(m.animalTypeId().equals(f.preferredAnimalTypeId())){  // 동물상(남성) == 선호 동물상(여성)
+                    if (m.animalTypeId().equals(f.preferredAnimalTypeId())) {  // 동물상(남성) == 선호 동물상(여성)
                         maleToFemale[mIndex][fIndex] = true;
                     }
-                    if(m.preferredAnimalTypeId().equals(f.animalTypeId())){  // 동물상(남성) == 선호 동물상(여성)
+                    if (m.preferredAnimalTypeId().equals(f.animalTypeId())) {  // 동물상(남성) == 선호 동물상(여성)
                         femaleToMale[mIndex][fIndex] = true;
                     }
                 }
@@ -57,9 +57,9 @@ public class MatchScoreCaculatePolicyImpl implements MatchScoreCalculatePolicy {
         }
 
         // Case 3(점수의 원소성) 보장을 위한 장치
-        for(int m = 0; m < maleUserIdIndex.size(); m++){
-            for(int f = 0; f < femaleUserIdIndex.size(); f++){
-                if(maleToFemale[m][f] && femaleToMale[m][f]){  // 서로 상대의 선호하는 동물상과 자신의 동물상이 일치하는가? (양방향성 확인)
+        for (int m = 0; m < maleUserIdIndex.size(); m++) {
+            for (int f = 0; f < femaleUserIdIndex.size(); f++) {
+                if (maleToFemale[m][f] && femaleToMale[m][f]) {  // 서로 상대의 선호하는 동물상과 자신의 동물상이 일치하는가? (양방향성 확인)
                     scoreBoard[m][f] += 60;
                 }
             }
@@ -81,8 +81,6 @@ public class MatchScoreCaculatePolicyImpl implements MatchScoreCalculatePolicy {
         Set<UserInterestMatchCandidate> maleUserSet = new HashSet<>(maleUserList);      // 중복 제거를 위해, 남성 사용자: List -> Set으로 변환한다.
         Set<UserInterestMatchCandidate> femaleUserSet = new HashSet<>(femaleUserList);  // 중복 제거를 위해, 여성 사용자: List -> Set으로 변환한다.
 
-        boolean[][] isVisit = new boolean[maleUserIdIndex.size()][femaleUserIdIndex.size()];    // scoreBoard 방문여부 체크
-
         for (UserInterestMatchCandidate m : maleUserSet) {
             if (m == null) continue;        // Case 1(데이터 신규 추가)를 위한 장치
             for (UserInterestMatchCandidate f : femaleUserSet) {
@@ -93,18 +91,7 @@ public class MatchScoreCaculatePolicyImpl implements MatchScoreCalculatePolicy {
                 if (mIndex == null || fIndex == null) continue; // Case 2(데이터 수정)를 위한 장치
 
                 if (m.interestId().equals(f.interestId())) {    // 관심사가 서로 같은가?
-                    if (scoreBoard[mIndex][fIndex] > 0) {       // 매칭 필터(동물상 1개 이상 선택)를 통과 했는가?
-                        scoreBoard[mIndex][fIndex] += 10;       // 관심사 매칭 점수 부여(중첩)
-                        isVisit[mIndex][fIndex] = true;         // 방문 체크
-                    }
-                }
-            }
-        }
-
-        for (int m = 0; m < isVisit.length; m++) {
-            for (int f = 0; f < isVisit[m].length; f++) {
-                if (!isVisit[m][f]) {           // 관심사 하나라도 선택 안했는가?
-                    scoreBoard[m][f] = 0;       // 점수 0점 처리
+                    scoreBoard[mIndex][fIndex] += 30;       // 관심사 매칭 점수 부여(중첩)
                 }
             }
         }
@@ -137,18 +124,7 @@ public class MatchScoreCaculatePolicyImpl implements MatchScoreCalculatePolicy {
                 if (mIndex == null || fIndex == null) continue; // Case 2(데이터 수정)를 위한 장치
 
                 if (m.movieGenreId().equals(f.movieGenreId())) {    // 영화 장르가 서로 같은가?
-                    if (scoreBoard[mIndex][fIndex] > 0) {           // 매칭 필터(동물상, 관심사 1개 이상 선택)를 통과 했는가?
-                        scoreBoard[mIndex][fIndex] += 5;           // 영화 매칭 점수 부여(중첩)
-                        isVisit[mIndex][fIndex] = true;             // 방문 체크
-                    }
-                }
-            }
-        }
-
-        for (int m = 0; m < isVisit.length; m++) {
-            for (int f = 0; f < isVisit[m].length; f++) {
-                if (!isVisit[m][f]) {           // 영화 장르 하나라도 선택 안했는가?
-                    scoreBoard[m][f] = 0;       // 점수 0점 처리
+                    scoreBoard[mIndex][fIndex] += 10;           // 영화 매칭 점수 부여(중첩)
                 }
             }
         }
