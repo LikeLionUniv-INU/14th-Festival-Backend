@@ -3,6 +3,7 @@ package com.likelion.zooting.domain.match.policy.impl;
 import com.likelion.zooting.domain.match.repository.UserMatchRepository;
 import com.likelion.zooting.domain.match.repository.data.UserAnimalMatchCandidate;
 import com.likelion.zooting.domain.match.repository.data.UserInterestMatchCandidate;
+import com.likelion.zooting.domain.match.repository.data.UserMovieGenreMatchCandidate;
 import com.likelion.zooting.domain.user.entity.Gender;
 import com.likelion.zooting.domain.user.entity.Status;
 import org.junit.jupiter.api.Test;
@@ -157,6 +158,78 @@ class MatchPolicyImplTest {
 
         int[][] resultOfScoreBoard = matchScoreCaculatePolicy.calculateInterestScore(scoreBoard, maleUserIdIndex, femaleUserIdIndex);
         int[][] resultOfAccumulatedScoreBoard = matchScoreCaculatePolicy.calculateInterestScore(accumulatedScoreBoard, maleUserIdIndex, femaleUserIdIndex);
+        System.out.println(Arrays.deepToString(resultOfScoreBoard));
+        System.out.println(Arrays.deepToString(resultOfAccumulatedScoreBoard));
+    }
+
+    /**
+     * - UserMovieGenreMatchCandidate {Long userId, Long movieGenreId}
+     * 남성
+     * m1 : {11L, 1L}, {11L, 4L}
+     * m2 : {12L, 3L}, {12L, 5L}
+     * m3 : {13L, 2L}, {13L, 4L}
+     * 여성
+     * f1 : {23L, 2L}, {23L, 4L}
+     * f2 : {21L, 5L}, {21L, 6L}
+     * f3 : {22L, 4L}, {22L, 5L}
+     * - 영화장르 ID
+     * 1, 2, 3, 4, 5, 6
+     */
+    @Test
+    void testCalculateMovieGenreScore() {
+        // 사용자의 영화 장르 리스트 생성 - 남성
+        List<UserMovieGenreMatchCandidate> maleUserMovieGenre = List.of(
+                // m1 (11L): 1, 4
+                new UserMovieGenreMatchCandidate(11L, 1L),
+                new UserMovieGenreMatchCandidate(11L, 4L),
+
+                // m2 (12L): 3, 5
+                new UserMovieGenreMatchCandidate(12L, 3L),
+                new UserMovieGenreMatchCandidate(12L, 5L),
+
+                // m3 (13L): 2, 4
+                new UserMovieGenreMatchCandidate(13L, 2L),
+                new UserMovieGenreMatchCandidate(13L, 4L)
+        );
+        // 사용자의 영화 장르 리스트 생성 - 여성
+        List<UserMovieGenreMatchCandidate> femaleUserMovieGenre = List.of(
+                // f1 (23L): 2, 4
+                new UserMovieGenreMatchCandidate(23L, 2L),
+                new UserMovieGenreMatchCandidate(23L, 4L),
+
+                // f2 (21L): 5, 6
+                new UserMovieGenreMatchCandidate(21L, 5L),
+                new UserMovieGenreMatchCandidate(21L, 6L),
+
+                // f3 (22L): 4, 5
+                new UserMovieGenreMatchCandidate(22L, 4L),
+                new UserMovieGenreMatchCandidate(22L, 5L)
+        );
+
+        // 사용자 인덱스 생성
+        Map<Long, Integer> maleUserIdIndex = Map.of(11L, 0, 12L, 1, 13L, 2);
+        Map<Long, Integer> femaleUserIdIndex = Map.of(23L, 0, 21L, 1, 22L, 2);
+
+        // userMatchRepository가 호출될 때 반환할 값 설정
+        when(userMatchRepository.findUserMovieGenreMatchCandidate(Gender.MALE, Status.SUBMITTED)).thenReturn(maleUserMovieGenre);
+        when(userMatchRepository.findUserMovieGenreMatchCandidate(Gender.FEMALE, Status.SUBMITTED)).thenReturn(femaleUserMovieGenre);
+
+        // 빈 점수판 생성 -> 0인 값은 이전 값에서 거른 값이라 간주하기에, 100으로 채웠다.
+        int[][] scoreBoard = {
+                {100, 100, 100},
+                {100, 100, 100},
+                {100, 100, 100},
+        };
+
+        // 채워진 점수판 생성(이전 testCalculateInterestScore의 result)
+        int[][] accumulatedScoreBoard = {
+                {0, 0, 0},
+                {70, 0, 0},
+                {0, 0, 70}
+        };
+
+        int[][] resultOfScoreBoard = matchScoreCaculatePolicy.calculateMovieGenreScore(scoreBoard, maleUserIdIndex, femaleUserIdIndex);
+        int[][] resultOfAccumulatedScoreBoard = matchScoreCaculatePolicy.calculateMovieGenreScore(accumulatedScoreBoard, maleUserIdIndex, femaleUserIdIndex);
         System.out.println(Arrays.deepToString(resultOfScoreBoard));
         System.out.println(Arrays.deepToString(resultOfAccumulatedScoreBoard));
     }

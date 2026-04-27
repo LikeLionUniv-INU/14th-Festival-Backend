@@ -138,7 +138,7 @@ public class MatchScoreCaculatePolicyImpl implements MatchScoreCalculatePolicy {
 
                 if (m.movieGenreId().equals(f.movieGenreId())) {    // 영화 장르가 서로 같은가?
                     if (scoreBoard[mIndex][fIndex] > 0) {           // 매칭 필터(동물상, 관심사 1개 이상 선택)를 통과 했는가?
-                        scoreBoard[mIndex][fIndex] += 10;           // 관심사 매칭 점수 부여(중첩)
+                        scoreBoard[mIndex][fIndex] += 5;           // 영화 매칭 점수 부여(중첩)
                         isVisit[mIndex][fIndex] = true;             // 방문 체크
                     }
                 }
