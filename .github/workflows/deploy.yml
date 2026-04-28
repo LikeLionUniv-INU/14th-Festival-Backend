@@ -26,4 +26,13 @@ jobs:
             docker compose -f docker-compose.yml up -d --build
 
             docker ps
-            curl -f https://api.zooting.site/actuator/health
+            
+            for i in {1..10}; do
+              if curl -fsS https://api.zooting.site/actuator/health; then
+                exit 0
+              fi
+              echo "Spring Boot is not ready yet. Retry $i/10..."
+              sleep 10
+            done
+            
+            exit 1
