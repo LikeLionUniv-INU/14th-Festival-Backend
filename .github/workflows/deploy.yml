@@ -1,0 +1,29 @@
+name: Deploy Backend to EC2
+
+on:
+  push:
+    branches:
+      - dev  # TODO: 운영 전환 시 master 브랜치로 변경 (배포 트리거)
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Deploy to EC2
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_KEY }}
+          script: |
+            cd ${{ secrets.EC2_PROJECT_PATH }}
+            
+            # ===== 배포 브랜치 설정 =====
+            git fetch origin dev
+            git reset --hard origin/dev
+
+            docker compose -f docker-compose.yml up -d --build
+
+            docker ps
+            curl -f https://api.zooting.site/actuator/health
