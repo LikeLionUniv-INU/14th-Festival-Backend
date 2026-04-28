@@ -1,14 +1,13 @@
 package com.likelion.zooting.domain.match.service;
 
 import com.likelion.zooting.domain.match.dto.MatchRequest;
-import com.likelion.zooting.domain.match.dto.data.UserAnimalMatchCandidate;
-import com.likelion.zooting.domain.match.dto.data.UserInterestMatchCandidate;
-import com.likelion.zooting.domain.match.dto.data.UserMovieGenreMatchCandidate;
+import com.likelion.zooting.domain.match.dto.data.*;
 import com.likelion.zooting.domain.match.mapper.MatchMapper;
+import com.likelion.zooting.domain.match.policy.MatchCountPolicy;
 import com.likelion.zooting.domain.match.policy.MatchPolicy;
 import com.likelion.zooting.domain.match.policy.MatchScoreCalculatePolicy;
 import com.likelion.zooting.domain.match.policy.MatchScoreType;
-import com.likelion.zooting.domain.match.dto.data.TempMatchResult;
+import com.likelion.zooting.domain.match.repository.MatchRepository;
 import com.likelion.zooting.domain.user.entity.Gender;
 import com.likelion.zooting.domain.user.entity.Status;
 import com.likelion.zooting.domain.user.entity.User;
@@ -20,6 +19,7 @@ import com.likelion.zooting.domain.usermoviegenre.repository.UserMovieGenreRepos
 import com.likelion.zooting.domain.userpreferredanimaltype.UserPreferredAnimalTypeRepository;
 import com.likelion.zooting.domain.userpreferredanimaltype.entity.UserPreferredAnimalType;
 import com.likelion.zooting.global.exception.GeneralException;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -35,8 +35,10 @@ import java.util.stream.IntStream;
 @RequiredArgsConstructor    // final 필드의 생성자 자동 생성
 public class MatchService {
     private final MatchPolicy matchPolicy;
+    private final MatchCountPolicy matchCountPolicy;
     private final MatchScoreCalculatePolicy matchScoreCalculatePolicy;
 
+    private final MatchRepository matchRepository;
     private final UserRepository userRepository;
     private final UserPreferredAnimalTypeRepository userPreferredAnimalTypeRepository;
     private final UserInterestRepository userInterestRepository;
@@ -142,20 +144,52 @@ public class MatchService {
 
         // 만일 매칭 결과 저장할 경우
         if (isSave) {
-            // 추후 "매칭 결과 저장(확정) API" 구현 시 채울 부분
+            if (saveResultOfMatch(simulatedMatchResult.finalMatchedPairList(),
+                    maleUsers,
+                    femaleUsers,
+                    maleUserAnimalMatchCandidates,
+                    femaleUserAnimalMatchCandidates,
+                    maleUserInterestMatchCandidates,
+                    femaleUserInterestMatchCandidates,
+                    maleUserMovieGenreMatchCandidates,
+                    femaleUserMovieGenreMatchCandidates)) {
+
+            }
         }
 
         return MatchRequest.builder().totalUserCount(simulatedMatchResult.totalUserCount()).matchedPairCount(simulatedMatchResult.matchedPairCount()).unmatchedUserCount(simulatedMatchResult.unmatchedUserCount()).simulatedAt(simulatedAt).build();
     }
 
+    /**
+     * 사용자 리스트를 "사용자 ID -> 인덱스" 맵으로 변환합니다.
+     *
+     * @param users 사용자 리스트
+     * @return 사용자 ID -> 인덱스 맵
+     */
     private Map<Long, Integer> getUserIdToIndex(List<User> users) {
         return IntStream.range(0, users.size()).boxed().collect(Collectors.toMap(i -> users.get(i).getUserId(), i -> i));
     }
 
+    /**
+     * 사용자 리스트를 "인덱스 -> 사용자 ID" 맵으로 변환합니다.
+     *
+     * @param users 사용자 리스트
+     * @return 인덱스 -> 사용자 ID 맵
+     */
     private Map<Integer, Long> getIndexToUserId(List<User> users) {
         return IntStream.range(0, users.size()).boxed().collect(Collectors.toMap(i -> i, i -> users.get(i).getUserId()));
     }
 
+    /**
+     * 사용자를 기준으로 동물상과 선호 동물상을 매핑한 리스트를 만들어냅니다.
+     * <p>
+     * {@link MatchMapper}의 mapToUserAnimalMatchCandidate란 매퍼를 사용합니다.
+     * </p>
+     *
+     * @param users                사용자 리스트
+     * @param preferredAnimalTypes 선호 동물상 리스트
+     * @return 사용자별 동물상과 선호 동물상을 매핑한 리스트
+     */
     private List<UserAnimalMatchCandidate> getUserAnimalMatchCandidates(List<User> users, List<UserPreferredAnimalType> preferredAnimalTypes) {
         List<UserAnimalMatchCandidate> results = new ArrayList<>();
         for (User u : users) {
@@ -169,6 +203,16 @@ public class MatchService {
         return results;
     }
 
+    /**
+     * 사용자를 기준으로 관심사를 매핑한 리스트를 만들어냅니다.
+     * <p>
+     * {@link MatchMapper}의 mapToUserInterestMatchCandidate란 매퍼를 사용합니다.
+     * </p>
+     *
+     * @param users         사용자 리스트
+     * @param userInterests 관심사 리스트
+     * @return 사용자별 관심사 매핑한 리스트
+     */
     private List<UserInterestMatchCandidate> getUserInterestMatchCandidates(List<User> users, List<UserInterest> userInterests) {
         List<UserInterestMatchCandidate> results = new ArrayList<>();
         for (User u : users) {
@@ -182,6 +226,16 @@ public class MatchService {
         return results;
     }
 
+    /**
+     * 사용자 기준으로 영화 장르를 매핑한 리스트를 만들어냅니다.
+     * <p>
+     * {@link MatchMapper}의 mapToUserMovieGenreMatchCandidate란 매퍼를 사용합니다.
+     * </p>
+     *
+     * @param users           사용자 리스트
+     * @param userMovieGenres 영화 장르 리스트
+     * @return 사용자별 영화 장르 매핑한 리스트
+     */
     private List<UserMovieGenreMatchCandidate> getUserMovieGenreMatchCandidates(List<User> users, List<UserMovieGenre> userMovieGenres) {
         List<UserMovieGenreMatchCandidate> results = new ArrayList<>();
         for (User u : users) {
@@ -222,7 +276,35 @@ public class MatchService {
         }
         // 3. 중복 데이터 검사
         if (new HashSet<>(list).size() != list.size()) {
-            throw new GeneralException(type.getErrorCode());
+            throw new GeneralException(MatchScoreType.DUPLICATED_ID.getErrorCode());
         }
     }
+
+    /**
+     * 시뮬레이션 결과를 토대로 매칭된 쌍들을 DB에 저장합니다.
+     *
+     * @param finalMatchedPairList                시뮬레이션 결과물(누가 몇 점으로 매칭되었는지만 담고 있다.)
+     * @param maleUsers                           남성 사용자
+     * @param femaleUsers                         여성 사용자
+     * @param maleUserAnimalMatchCandidates       남성 사용자와 동물상 매칭 후보들
+     * @param femaleUserAnimalMatchCandidates     여성 사용자와 동물상 매칭 후보들
+     * @param maleUserInterestMatchCandidates     남성 사용자와 관심사 매칭 후보들
+     * @param femaleUserInterestMatchCandidates   여성 사용자와 관심사 매칭 후보들
+     * @param maleUserMovieGenreMatchCandidates   남성 사용자와 영화 장르 매칭 후보들
+     * @param femaleUserMovieGenreMatchCandidates 여성 사용자와 영화 장르 매칭 후보들
+     * @return DB에 저장되었는지 여부(true / false)
+     */
+    @Transactional  // -> public써야 한다.
+    public boolean saveResultOfMatch(List<TempMatch> finalMatchedPairList,
+                                     List<User> maleUsers,
+                                     List<User> femaleUsers,
+                                     List<UserAnimalMatchCandidate> maleUserAnimalMatchCandidates,
+                                     List<UserAnimalMatchCandidate> femaleUserAnimalMatchCandidates,
+                                     List<UserInterestMatchCandidate> maleUserInterestMatchCandidates,
+                                     List<UserInterestMatchCandidate> femaleUserInterestMatchCandidates,
+                                     List<UserMovieGenreMatchCandidate> maleUserMovieGenreMatchCandidates,
+                                     List<UserMovieGenreMatchCandidate> femaleUserMovieGenreMatchCandidates) {
+        return true;
+    }
+
 }

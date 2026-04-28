@@ -3,11 +3,11 @@ package com.likelion.zooting.domain.match.dto.data;
 /**
  * 사용자와 관심사의 매칭을 위한 가공 데이터
  *
- * @param userId
- * @param interestId
+ * @param userId     사용자 ID
+ * @param interestId 해당 사용자의 관심사 ID
  */
 public record UserInterestMatchCandidate(
-        Long userId,    // 사용자
-        Long interestId     // 정확한 중복 필터 로직을 위한 관심사 아이디
+        Long userId,
+        Long interestId
 ) {
 }
