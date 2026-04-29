@@ -2,6 +2,8 @@ package com.likelion.zooting.domain.match.service;
 
 import com.likelion.zooting.domain.match.dto.MatchRequest;
 import com.likelion.zooting.domain.match.dto.data.*;
+import com.likelion.zooting.domain.match.entity.Match;
+import com.likelion.zooting.domain.match.exception.MatchInnerErrorCode;
 import com.likelion.zooting.domain.match.mapper.MatchMapper;
 import com.likelion.zooting.domain.match.policy.MatchCountPolicy;
 import com.likelion.zooting.domain.match.policy.MatchPolicy;
@@ -76,6 +78,7 @@ public class MatchService {
      * @param isSave DB 저장 여부 (true: 저장 수행, false: 시뮬레이션 결과만 반환)
      * @return 매칭 결과 통계 및 정보가 담긴 DTO
      */
+    @Transactional
     public MatchRequest getResultOfMatching(boolean isSave) {
         // 매칭 결과
         TempMatchResult simulatedMatchResult;
@@ -142,9 +145,14 @@ public class MatchService {
         // 매칭 (greedy algorithm)
         simulatedMatchResult = matchPolicy.simulateMatching(scoreBoard, indexToMaleUserId, indexToFemaleUserId);
 
+        // 매칭이 하나도 되지 않을 경우
+        if(simulatedMatchResult.finalMatchedPairList().isEmpty()){
+            throw new GeneralException(MatchInnerErrorCode.NO_MATCHED_USER_CANDIDATES);
+        }
+
         // 만일 매칭 결과 저장할 경우
         if (isSave) {
-            if (saveResultOfMatch(simulatedMatchResult.finalMatchedPairList(),
+            saveResultOfMatch(simulatedMatchResult.finalMatchedPairList(),
                     maleUsers,
                     femaleUsers,
                     maleUserAnimalMatchCandidates,
@@ -152,12 +160,14 @@ public class MatchService {
                     maleUserInterestMatchCandidates,
                     femaleUserInterestMatchCandidates,
                     maleUserMovieGenreMatchCandidates,
-                    femaleUserMovieGenreMatchCandidates)) {
-
-            }
+                    femaleUserMovieGenreMatchCandidates);
         }
 
-        return MatchRequest.builder().totalUserCount(simulatedMatchResult.totalUserCount()).matchedPairCount(simulatedMatchResult.matchedPairCount()).unmatchedUserCount(simulatedMatchResult.unmatchedUserCount()).simulatedAt(simulatedAt).build();
+        return MatchRequest.builder()
+                .totalUserCount(simulatedMatchResult.totalUserCount())
+                .matchedPairCount(simulatedMatchResult.matchedPairCount())
+                .unmatchedUserCount(simulatedMatchResult.unmatchedUserCount())
+                .simulatedAt(simulatedAt).build();
     }
 
     /**
@@ -282,6 +292,18 @@ public class MatchService {
 
     /**
      * 시뮬레이션 결과를 토대로 매칭된 쌍들을 DB에 저장합니다.
+     * <p><b>[반환 값의 설명]</b></p>
+     * <ul>
+     * <li><b>false : </b>이미 한 번 실행한 경우(Match 저장 여부로 판단)</li>
+     * <li><b>true : </b>시뮬레이션 결과물을 DB에 저장</li>
+     * </ul>
+     * <p><b>[중복 판단 방식]</b></p>
+     * <ul>
+     * <li>현 방식은 단순히 모든 Match를 가져와 하나라도 존재하는지 판단한다.</li>
+     * <li><s>모든 Match를 가져오는 방식은 위험하지만, 우리 서비스를 이용할 약 200 명의 규모에선 괜찮다고 판단했다.</s> -> 남성, 여성 각각 확인하는 방식으로 찾는다.</li>
+     * <li>현 방식을 방지하기 위해선, Match의 생성일자에 대한 속성을 추가하고, Option을 사용해 오늘 생성한 Match 중 하나만 가져오도록 하면 해결할 수 있다.</li>
+     * <li>생성일자가 아니더라도, 우리가 알 수 있는 값이면 무엇이든 가능하다.</li>
+     * </ul>
      *
      * @param finalMatchedPairList                시뮬레이션 결과물(누가 몇 점으로 매칭되었는지만 담고 있다.)
      * @param maleUsers                           남성 사용자
@@ -292,10 +314,9 @@ public class MatchService {
      * @param femaleUserInterestMatchCandidates   여성 사용자와 관심사 매칭 후보들
      * @param maleUserMovieGenreMatchCandidates   남성 사용자와 영화 장르 매칭 후보들
      * @param femaleUserMovieGenreMatchCandidates 여성 사용자와 영화 장르 매칭 후보들
-     * @return DB에 저장되었는지 여부(true / false)
      */
     @Transactional  // -> public써야 한다.
-    public boolean saveResultOfMatch(List<TempMatch> finalMatchedPairList,
+    public void saveResultOfMatch(List<TempMatch> finalMatchedPairList,
                                      List<User> maleUsers,
                                      List<User> femaleUsers,
                                      List<UserAnimalMatchCandidate> maleUserAnimalMatchCandidates,
@@ -304,7 +325,93 @@ public class MatchService {
                                      List<UserInterestMatchCandidate> femaleUserInterestMatchCandidates,
                                      List<UserMovieGenreMatchCandidate> maleUserMovieGenreMatchCandidates,
                                      List<UserMovieGenreMatchCandidate> femaleUserMovieGenreMatchCandidates) {
-        return true;
+        // 이미 한 번 실행한건가?-> DB에 남성 사용자에 대해 저장되어 있는 여부로 확인
+        if (matchRepository.existsByMaleUser_GenderAndMaleUser_Status(Gender.MALE, Status.SUBMITTED)) {
+            throw new GeneralException(MatchInnerErrorCode.DUPLICATE_EXECUTION_OF_MATCH_SAVE);
+        }
+
+
+        Map<Long, Long> maleUserAnimalMap = animalCandidateToMap(maleUserAnimalMatchCandidates);
+        Map<Long, Long> femaleUserAnimalMap = animalCandidateToMap(femaleUserAnimalMatchCandidates);
+        Map<Long, List<Long>> maleUserPreferredAnimalMap = preferredAnimalCandidateToMap(maleUserAnimalMatchCandidates);
+        Map<Long, List<Long>> femaleUserPreferredAnimalMap = preferredAnimalCandidateToMap(femaleUserAnimalMatchCandidates);
+        Map<Long, List<Long>> maleUserInterestMap = interestCandidateToMap(maleUserInterestMatchCandidates);
+        Map<Long, List<Long>> femaleUserInterestMap = interestCandidateToMap(femaleUserInterestMatchCandidates);
+        Map<Long, List<Long>> maleUserMovieGenreMap = movieGenreCandidateToMap(maleUserMovieGenreMatchCandidates);
+        Map<Long, List<Long>> femaleUserMovieGenreMap = movieGenreCandidateToMap(femaleUserMovieGenreMatchCandidates);
+
+        List<Match> pairs = finalMatchedPairList.stream()
+                .map(pair -> new MatchedPair(
+                        maleUsers.get(pair.maleUserIndex()),
+                        femaleUsers.get(pair.femaleUserIndex()),
+                        pair.score()
+                ))
+                .map(pair -> Match.create(
+                        pair.maleUser(),
+                        pair.femaleUser(),
+                        matchCountPolicy.getAnimalTypeCount(pair,
+                                maleUserAnimalMap,
+                                femaleUserAnimalMap,
+                                maleUserPreferredAnimalMap,
+                                femaleUserPreferredAnimalMap),
+                        matchCountPolicy.getInterestCount(pair,
+                                maleUserInterestMap,
+                                femaleUserInterestMap),
+                        matchCountPolicy.getMovieGenreCount(pair,
+                                maleUserMovieGenreMap,
+                                femaleUserMovieGenreMap),
+                        pair.score()
+                ))
+                .toList();
+
+        matchRepository.saveAll(pairs);
     }
 
+    /**
+     * 사용자별 동물상 데이터에 대한 조회 효율을 위해 Map 구조로 변환한다.
+     * @param userAnimalMatchCandidates 사용자별 동물상 리스트
+     * @return (사용자 ID -> 동물상 ID) Map
+     */
+    public Map<Long, Long> animalCandidateToMap(List<UserAnimalMatchCandidate> userAnimalMatchCandidates) {
+        return userAnimalMatchCandidates.stream().collect(Collectors.toMap(uamc -> uamc.userId(), uamc -> uamc.animalTypeId()));
+    }
+
+    /**
+     * 사용자별 선호 동물상 데이터에 대한 조회 효율을 위해 Map 구조로 변환한다.
+     * @param userAnimalMatchCandidates 사용자별 동물상 리스트
+     * @return (사용자 ID -> 선호 동물상 ID List) Map
+     */
+    public Map<Long, List<Long>> preferredAnimalCandidateToMap(List<UserAnimalMatchCandidate> userAnimalMatchCandidates) {
+        return userAnimalMatchCandidates.stream()
+                .collect(Collectors.groupingBy(
+                        UserAnimalMatchCandidate::userId, // key : 사용자 ID
+                        Collectors.mapping(UserAnimalMatchCandidate::preferredAnimalTypeId, Collectors.toList()) // value : 선호 동물상 ID 리스트
+                ));
+    }
+
+    /**
+     * 사용자별 관심사 데이터에 대한 조회 효율을 위해 Map 구조로 변환한다.
+     * @param userInterestMatchCandidates 사용자별 관심사 리스트
+     * @return (사용자 ID -> 관심사 ID List) Map
+     */
+    public Map<Long, List<Long>> interestCandidateToMap(List<UserInterestMatchCandidate> userInterestMatchCandidates) {
+        return userInterestMatchCandidates.stream()
+                .collect(Collectors.groupingBy(
+                        UserInterestMatchCandidate::userId, // key : 사용자 ID
+                        Collectors.mapping(UserInterestMatchCandidate::interestId, Collectors.toList()) // value : 관심사 ID
+                ));
+    }
+
+    /**
+     * 사용자별 영화 장르 데이터에 대한 조회 효율을 위해 Map 구조로 변환한다.
+     * @param userMovieGenreMatchCandidates 사용자별 영화 장르 리스트
+     * @return (사용자 ID -> 영화 장르 ID List) Map
+     */
+    public Map<Long, List<Long>> movieGenreCandidateToMap(List<UserMovieGenreMatchCandidate> userMovieGenreMatchCandidates) {
+        return userMovieGenreMatchCandidates.stream()
+                .collect(Collectors.groupingBy(
+                        UserMovieGenreMatchCandidate::userId,
+                        Collectors.mapping(UserMovieGenreMatchCandidate::movieGenreId, Collectors.toList())
+                ));
+    }
 }
