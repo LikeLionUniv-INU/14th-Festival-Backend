@@ -1,4 +1,4 @@
-package com.likelion.zooting.domain.match.service;
+package com.likelion.zooting.domain.match.service.converter;
 
 import com.likelion.zooting.domain.match.service.data.UserAnimalMatchCandidate;
 import com.likelion.zooting.domain.match.service.data.UserInterestMatchCandidate;
