@@ -1,22 +1,15 @@
 package com.likelion.zooting.domain.match.policy.impl;
 
-import com.likelion.zooting.domain.match.repository.UserMatchRepository;
 import com.likelion.zooting.domain.match.dto.data.UserAnimalMatchCandidate;
 import com.likelion.zooting.domain.match.dto.data.UserInterestMatchCandidate;
 import com.likelion.zooting.domain.match.dto.data.UserMovieGenreMatchCandidate;
-import com.likelion.zooting.domain.user.entity.Gender;
-import com.likelion.zooting.domain.user.entity.Status;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-
-import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class MatchScoreCalculatePolicyImplTest {

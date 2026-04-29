@@ -3,7 +3,6 @@ package com.likelion.zooting.domain.match.policy;
 import com.likelion.zooting.domain.match.dto.data.UserAnimalMatchCandidate;
 import com.likelion.zooting.domain.match.dto.data.UserInterestMatchCandidate;
 import com.likelion.zooting.domain.match.dto.data.UserMovieGenreMatchCandidate;
-import com.likelion.zooting.domain.match.repository.UserMatchRepository;
 
 import java.util.List;
 import java.util.Map;
@@ -25,7 +24,6 @@ import java.util.Map;
  * <li><b>공통 타입:</b> 강아지, 고양이, 햄스터</li>
  * <li><b>남성 전용:</b> 곰, 원숭이, 공룡</li>
  * <li><b>여성 전용:</b> 토끼, 사슴, 병아리</li>
- * <li><b>상관없음 처리:</b> {@link UserMatchRepository#findUserAnimalMatchCandidates} 로직을 참조하십시오.</li>
  * </ul>
  *
  * <p><b>3. 확장성 및 정책 적용 원칙</b></p>

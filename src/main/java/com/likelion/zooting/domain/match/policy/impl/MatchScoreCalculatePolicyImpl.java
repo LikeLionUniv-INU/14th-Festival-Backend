@@ -3,12 +3,7 @@ package com.likelion.zooting.domain.match.policy.impl;
 import com.likelion.zooting.domain.match.dto.data.UserAnimalMatchCandidate;
 import com.likelion.zooting.domain.match.dto.data.UserInterestMatchCandidate;
 import com.likelion.zooting.domain.match.dto.data.UserMovieGenreMatchCandidate;
-import com.likelion.zooting.domain.match.exception.MatchInnerErrorCode;
 import com.likelion.zooting.domain.match.policy.MatchScoreCalculatePolicy;
-import com.likelion.zooting.domain.match.repository.UserMatchRepository;
-import com.likelion.zooting.domain.user.entity.Gender;
-import com.likelion.zooting.domain.user.entity.Status;
-import com.likelion.zooting.global.exception.GeneralException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
