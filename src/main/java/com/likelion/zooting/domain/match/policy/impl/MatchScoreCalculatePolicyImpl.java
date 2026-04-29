@@ -1,8 +1,8 @@
 package com.likelion.zooting.domain.match.policy.impl;
 
-import com.likelion.zooting.domain.match.dto.data.UserAnimalMatchCandidate;
-import com.likelion.zooting.domain.match.dto.data.UserInterestMatchCandidate;
-import com.likelion.zooting.domain.match.dto.data.UserMovieGenreMatchCandidate;
+import com.likelion.zooting.domain.match.service.data.UserAnimalMatchCandidate;
+import com.likelion.zooting.domain.match.service.data.UserInterestMatchCandidate;
+import com.likelion.zooting.domain.match.service.data.UserMovieGenreMatchCandidate;
 import com.likelion.zooting.domain.match.policy.MatchScoreCalculatePolicy;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;

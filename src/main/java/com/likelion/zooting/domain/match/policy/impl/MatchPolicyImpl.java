@@ -1,8 +1,8 @@
 package com.likelion.zooting.domain.match.policy.impl;
 
 import com.likelion.zooting.domain.match.policy.MatchPolicy;
-import com.likelion.zooting.domain.match.dto.data.TempMatch;
-import com.likelion.zooting.domain.match.dto.data.TempMatchResult;
+import com.likelion.zooting.domain.match.service.data.TempMatch;
+import com.likelion.zooting.domain.match.service.data.TempMatchResult;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;

@@ -1,4 +1,4 @@
-package com.likelion.zooting.domain.match.dto.data;
+package com.likelion.zooting.domain.match.service.data;
 
 /**
  * 사용자와 관심사의 매칭을 위한 가공 데이터

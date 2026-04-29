@@ -1,4 +1,4 @@
-package com.likelion.zooting.domain.match.dto.data;
+package com.likelion.zooting.domain.match.service.data;
 
 /**
  * 매칭 로직 전 임시로 남성, 여성 사용자 쌍을 담을 가공 데이터

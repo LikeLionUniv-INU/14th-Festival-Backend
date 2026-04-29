@@ -1,6 +1,6 @@
 package com.likelion.zooting.domain.match.policy;
 
-import com.likelion.zooting.domain.match.dto.data.*;
+import com.likelion.zooting.domain.match.service.data.MatchedPair;
 
 import java.util.List;
 import java.util.Map;

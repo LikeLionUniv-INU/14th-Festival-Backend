@@ -1,7 +1,8 @@
 package com.likelion.zooting.domain.match.policy.impl;
 
-import com.likelion.zooting.domain.match.dto.data.*;
+
 import com.likelion.zooting.domain.match.policy.MatchCountPolicy;
+import com.likelion.zooting.domain.match.service.data.MatchedPair;
 import org.springframework.stereotype.Component;
 
 import java.util.List;

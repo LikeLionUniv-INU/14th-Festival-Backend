@@ -1,6 +1,6 @@
 package com.likelion.zooting.domain.match.policy;
 
-import com.likelion.zooting.domain.match.dto.data.TempMatchResult;
+import com.likelion.zooting.domain.match.service.data.TempMatchResult;
 
 import java.util.Map;
 
