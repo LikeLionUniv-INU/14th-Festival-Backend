@@ -2,13 +2,41 @@ package com.likelion.zooting.domain.match.entity;
 
 import com.likelion.zooting.domain.user.entity.User;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)  // JPA만 접근 가능
 @Table(name = "MATCH")
 public class Match {
+    /**
+     * {@link Match} 엔티티 생성을 위한 정적 팩토리 메서드입니다.
+     * <p>
+     * 외부에서 생성자를 통한 직접적인 객체 생성을 제한(Access Control)하고,
+     * 매칭에 필요한 모든 필드를 한 번에 주입받아 객체의 원자성(Atomicity)을 보장합니다.
+     * </p>
+     *
+     * @param maleUser    남성 사용자
+     * @param femaleUser  여성 사용자
+     * @param animalNum   매칭된 동물상 수
+     * @param interestNum 매칭된 관심사 수
+     * @param movieNum    매칭된 영화 장르 수
+     * @param score       총 매칭 점수
+     * @return 매칭 정보가 완성된 Match 인스턴스
+     */
+    public static Match create(User maleUser, User femaleUser, Integer animalNum, Integer interestNum, Integer movieNum, Integer score) {
+        Match match = new Match();
+        match.maleUser = maleUser;
+        match.femaleUser = femaleUser;
+        match.animalNum = animalNum;
+        match.interestNum = interestNum;
+        match.movieNum = movieNum;
+        match.score = score;
+        return match;
+    }
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "MATCH_ID")
