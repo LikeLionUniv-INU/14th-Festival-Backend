@@ -43,7 +43,12 @@ public class SecurityConfig {
          *
          * - 쿠키/세션/인증 정보를 포함한 요청을 허용하려면 "*" 대신 정확한 프론트 주소를 적어야 함
          */
-        config.setAllowedOrigins(List.of("*"));
+        config.setAllowedOrigins(List.of(
+                "http://localhost:3000",
+                "https://14th-festival-frontend.vercel.app",
+                "https://zooting.site",
+                "https://www.zooting.site"
+        ));
         config.setAllowedMethods(List.of("*"));
         config.setAllowedHeaders(List.of("*"));
 
