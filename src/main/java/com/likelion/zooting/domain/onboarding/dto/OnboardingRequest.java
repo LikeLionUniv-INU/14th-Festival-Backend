@@ -1,4 +1,4 @@
-package com.likelion.zooting.domain.user.dto;
+package com.likelion.zooting.domain.onboarding.dto;
 
 import jakarta.validation.constraints.*;
 import java.util.List;
@@ -12,7 +12,7 @@ public record OnboardingRequest(
     String myAnimalType,
 
     @NotNull
-    @Size(min = 2, max = 2, message = "원하는 상대 동물상은 정확히 2개를 선택해야 합니다")
+    @Size(min = 3, max = 3, message = "원하는 상대 동물상은 정확히 3개를 선택해야 합니다")
     List<String> preferredAnimalTypes,
 
     @NotNull
