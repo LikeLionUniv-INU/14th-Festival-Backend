@@ -34,8 +34,16 @@ public interface MatchControllerDocs {
                     responseCode = "404",
                     description = "매칭 대상자 없음",
                     content = @Content(schema = @Schema(implementation = com.likelion.zooting.global.response.ApiResponse.class))
+            ),
+            @ApiResponse(
+                    responseCode = "409",
+                    description = "이미 매칭 결과 저장됨",
+                    content = @Content(schema = @Schema(implementation = com.likelion.zooting.global.response.ApiResponse.class))
             )
     })
     @PostMapping("/simulate")
     ResponseEntity<com.likelion.zooting.global.response.ApiResponse<MatchRequest>> simulateMatch();
+
+    @PostMapping("/run")
+    ResponseEntity<com.likelion.zooting.global.response.ApiResponse<MatchRequest>> runMatch();
 }
