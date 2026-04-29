@@ -1,7 +1,6 @@
 package com.likelion.zooting.domain.match.service;
 
 import com.likelion.zooting.domain.match.dto.MatchRequest;
-import com.likelion.zooting.domain.match.mapper.MatchMapper;
 import com.likelion.zooting.domain.match.policy.MatchPolicy;
 import com.likelion.zooting.domain.match.policy.MatchScoreCalculatePolicy;
 import com.likelion.zooting.domain.match.policy.MatchScoreType;
@@ -42,7 +41,7 @@ public class MatchService {
     private final UserInterestRepository userInterestRepository;
     private final UserMovieGenreRepository userMovieGenreRepository;
 
-    private final MatchMapper matchMapper;
+    private final MatchDataConverter matchDataConverter;
 
     /**
      * 매칭 시뮬레이션을 수행하고 최종 결과를 반환합니다.
@@ -181,7 +180,7 @@ public class MatchService {
     /**
      * 사용자를 기준으로 동물상과 선호 동물상을 매핑한 리스트를 만들어냅니다.
      * <p>
-     * {@link MatchMapper}의 mapToUserAnimalMatchCandidate란 매퍼를 사용합니다.
+     * {@link MatchDataConverter}의 mapToUserAnimalMatchCandidate란 매퍼를 사용합니다.
      * </p>
      *
      * @param users                사용자 리스트
@@ -193,7 +192,7 @@ public class MatchService {
         for (User u : users) {
             for (UserPreferredAnimalType upa : preferredAnimalTypes) {
                 if (upa.getUser().equals(u)) {
-                    results.add(matchMapper.mapToUserAnimalMatchCandidate(u, upa));
+                    results.add(matchDataConverter.mapToUserAnimalMatchCandidate(u, upa));
                 }
             }
         }
@@ -204,7 +203,7 @@ public class MatchService {
     /**
      * 사용자를 기준으로 관심사를 매핑한 리스트를 만들어냅니다.
      * <p>
-     * {@link MatchMapper}의 mapToUserInterestMatchCandidate란 매퍼를 사용합니다.
+     * {@link MatchDataConverter}의 mapToUserInterestMatchCandidate란 매퍼를 사용합니다.
      * </p>
      *
      * @param users         사용자 리스트
@@ -216,7 +215,7 @@ public class MatchService {
         for (User u : users) {
             for (UserInterest ui : userInterests) {
                 if (ui.getUser().equals(u)) {
-                    results.add(matchMapper.mapToUserInterestMatchCandidate(u, ui));
+                    results.add(matchDataConverter.mapToUserInterestMatchCandidate(u, ui));
                 }
             }
         }
@@ -227,7 +226,7 @@ public class MatchService {
     /**
      * 사용자 기준으로 영화 장르를 매핑한 리스트를 만들어냅니다.
      * <p>
-     * {@link MatchMapper}의 mapToUserMovieGenreMatchCandidate란 매퍼를 사용합니다.
+     * {@link MatchDataConverter}의 mapToUserMovieGenreMatchCandidate란 매퍼를 사용합니다.
      * </p>
      *
      * @param users           사용자 리스트
@@ -239,7 +238,7 @@ public class MatchService {
         for (User u : users) {
             for (UserMovieGenre umg : userMovieGenres) {
                 if (umg.getUser().equals(u)) {
-                    results.add(matchMapper.mapToUserMovieGenreMatchCandidate(u, umg));
+                    results.add(matchDataConverter.mapToUserMovieGenreMatchCandidate(u, umg));
                 }
             }
         }

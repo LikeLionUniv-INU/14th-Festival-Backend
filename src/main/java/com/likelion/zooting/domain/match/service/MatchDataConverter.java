@@ -1,16 +1,16 @@
-package com.likelion.zooting.domain.match.mapper;
+package com.likelion.zooting.domain.match.service;
 
-import com.likelion.zooting.domain.match.dto.data.*;
+import com.likelion.zooting.domain.match.service.data.UserAnimalMatchCandidate;
+import com.likelion.zooting.domain.match.service.data.UserInterestMatchCandidate;
+import com.likelion.zooting.domain.match.service.data.UserMovieGenreMatchCandidate;
 import com.likelion.zooting.domain.user.entity.User;
 import com.likelion.zooting.domain.userinterest.entity.UserInterest;
 import com.likelion.zooting.domain.usermoviegenre.entity.UserMovieGenre;
 import com.likelion.zooting.domain.userpreferredanimaltype.entity.UserPreferredAnimalType;
 import org.springframework.stereotype.Component;
 
-import java.util.Map;
-
 @Component
-public class MatchMapper {
+public class MatchDataConverter {
     /**
      * 사용자와 동물상, 선호 도물상으로 매핑합니다
      * @param u 사용자

@@ -1,6 +1,6 @@
 package com.likelion.zooting.domain.match.policy.impl;
 
-import com.likelion.zooting.domain.match.dto.data.TempMatchResult;
+import com.likelion.zooting.domain.match.service.data.TempMatchResult;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
