@@ -27,7 +27,7 @@ public enum MatchInnerErrorCode implements BaseErrorCode {
     MALE_USER_MOVIE_GENRE_MATCH_CANDIDATE_NOT_FOUND("MATCH_500_10", "영화 장르 점수 계산을 위한 매칭 대기 리스트에 남성 사용자 정보가 없습니다.", HttpStatus.INTERNAL_SERVER_ERROR),
     FEMALE_USER_MOVIE_GENRE_MATCH_CANDIDATE_NOT_FOUND("MATCH_500_11", "영화 장르 계산을 위한 매칭 대기 리스트에 여성 사용자 정보가 없습니다.", HttpStatus.INTERNAL_SERVER_ERROR),
 
-    DUPLICATE_USER_ID("MATCH_500_12", "매칭에 중복된 사용자 ID가 존재합니다.", HttpStatus.INTERNAL_SERVER_ERROR)
+    DUPLICATE_ID("MATCH_500_12", "중복된 ID가 존재합니다.", HttpStatus.INTERNAL_SERVER_ERROR)
     ;
 
     private final String code;

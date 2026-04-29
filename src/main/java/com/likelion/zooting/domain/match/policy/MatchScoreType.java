@@ -20,6 +20,7 @@ public enum MatchScoreType {
     MOVIE_ID(MatchInnerErrorCode.USER_MOVIE_GENRE_ID_NOT_FOUND),                                    // 영화 장르 ID 매칭 타입
     MALE_MOVIE_ID(MatchInnerErrorCode.MALE_USER_MOVIE_GENRE_MATCH_CANDIDATE_NOT_FOUND),             // 남성 영화 장르 ID 매칭 타입
     FEMALE_MOVIE_ID(MatchInnerErrorCode.FEMALE_USER_MOVIE_GENRE_MATCH_CANDIDATE_NOT_FOUND),         // 여성 영화 장르 ID 매칭 타입
+    DUPLICATED_ID(MatchInnerErrorCode.DUPLICATE_ID)  // 중복된 ID 정보
     ;
     private final MatchInnerErrorCode errorCode;
 
