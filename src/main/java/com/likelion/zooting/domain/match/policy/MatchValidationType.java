@@ -8,7 +8,7 @@ import com.likelion.zooting.domain.match.exception.MatchInnerErrorCode;
  * {@link MatchInnerErrorCode}를 parameter로 사용합니다.
  * 검증 실패 시, 해당 상수에 정의된 {@link MatchInnerErrorCode}를 즉시 반환합니다.
  */
-public enum MatchScoreType {
+public enum MatchValidationType {
     MALE_USER_ID(MatchInnerErrorCode.MALE_USER_ID_NOT_FOUND),                               // 남성 사용자 ID 매칭 타입
     FEMALE_USER_ID(MatchInnerErrorCode.FEMALE_USER_ID_NOT_FOUND),                           // 여성 사용자 ID 매칭 타입
     PREFERRED_ANiMAL_ID(MatchInnerErrorCode.USER_PREFERRED_ANIMAL_ID_NOT_FOUND),                    // 선호 동물 ID 매칭 타입
@@ -24,7 +24,7 @@ public enum MatchScoreType {
     ;
     private final MatchInnerErrorCode errorCode;
 
-    MatchScoreType(MatchInnerErrorCode errorCode) {
+    MatchValidationType(MatchInnerErrorCode errorCode) {
         this.errorCode = errorCode;
     }
 

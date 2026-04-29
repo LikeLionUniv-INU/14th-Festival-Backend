@@ -3,7 +3,7 @@ package com.likelion.zooting.domain.match.service;
 import com.likelion.zooting.domain.match.dto.MatchRequest;
 import com.likelion.zooting.domain.match.policy.MatchPolicy;
 import com.likelion.zooting.domain.match.policy.MatchScoreCalculatePolicy;
-import com.likelion.zooting.domain.match.policy.MatchScoreType;
+import com.likelion.zooting.domain.match.policy.MatchValidationType;
 import com.likelion.zooting.domain.match.repository.MatchRepository;
 import com.likelion.zooting.domain.match.service.data.*;
 import com.likelion.zooting.domain.user.entity.Gender;
@@ -83,17 +83,17 @@ public class MatchService {
         List<User> maleUsers = userRepository.findByGenderAndStatus(Gender.MALE, Status.SUBMITTED);
         List<User> femaleUsers = userRepository.findByGenderAndStatus(Gender.FEMALE, Status.SUBMITTED);
         // 검정
-        checkValidate(maleUsers, MatchScoreType.MALE_USER_ID);
-        checkValidate(femaleUsers, MatchScoreType.FEMALE_USER_ID);
+        checkValidate(maleUsers, MatchValidationType.MALE_USER_ID);
+        checkValidate(femaleUsers, MatchValidationType.FEMALE_USER_ID);
 
         // repository에서 사용자 관련 데이터(선호 동물상, 관심사, 영화 장르) 가져오기
         List<UserPreferredAnimalType> userPreferredAnimalTypes = userPreferredAnimalTypeRepository.findAll();
         List<UserInterest> userInterests = userInterestRepository.findAll();
         List<UserMovieGenre> userMovieGenres = userMovieGenreRepository.findAll();
         // 검정
-        checkValidate(userPreferredAnimalTypes, MatchScoreType.PREFERRED_ANiMAL_ID);
-        checkValidate(userInterests, MatchScoreType.INTEREST_ID);
-        checkValidate(userMovieGenres, MatchScoreType.MOVIE_ID);
+        checkValidate(userPreferredAnimalTypes, MatchValidationType.PREFERRED_ANiMAL_ID);
+        checkValidate(userInterests, MatchValidationType.INTEREST_ID);
+        checkValidate(userMovieGenres, MatchValidationType.MOVIE_ID);
 
         // 사용자 ID -> index
         // 다른 데이터의 유입은 없으며, 사용자에 대한 검정은 거쳤으므로 해당 검정 과정은 넘어간다.
@@ -109,22 +109,22 @@ public class MatchService {
         List<UserAnimalMatchCandidate> maleUserAnimalMatchCandidates = getUserAnimalMatchCandidates(maleUsers, userPreferredAnimalTypes);
         List<UserAnimalMatchCandidate> femaleUserAnimalMatchCandidates = getUserAnimalMatchCandidates(femaleUsers, userPreferredAnimalTypes);
         // 검정
-        checkValidate(maleUserAnimalMatchCandidates, MatchScoreType.MALE_PREFERRED_ANiMAL_ID);
-        checkValidate(femaleUserAnimalMatchCandidates, MatchScoreType.FEMALE_PREFERRED_ANiMAL_ID);
+        checkValidate(maleUserAnimalMatchCandidates, MatchValidationType.MALE_PREFERRED_ANiMAL_ID);
+        checkValidate(femaleUserAnimalMatchCandidates, MatchValidationType.FEMALE_PREFERRED_ANiMAL_ID);
 
         // 관심사와 사용자 매핑한 리스트
         List<UserInterestMatchCandidate> maleUserInterestMatchCandidates = getUserInterestMatchCandidates(maleUsers, userInterests);
         List<UserInterestMatchCandidate> femaleUserInterestMatchCandidates = getUserInterestMatchCandidates(femaleUsers, userInterests);
         // 검정
-        checkValidate(maleUserInterestMatchCandidates, MatchScoreType.MALE_INTEREST_ID);
-        checkValidate(femaleUserInterestMatchCandidates, MatchScoreType.FEMALE_INTEREST_ID);
+        checkValidate(maleUserInterestMatchCandidates, MatchValidationType.MALE_INTEREST_ID);
+        checkValidate(femaleUserInterestMatchCandidates, MatchValidationType.FEMALE_INTEREST_ID);
 
         // 영화 장르와 사용자 매핑한 리스트
         List<UserMovieGenreMatchCandidate> maleUserMovieGenreMatchCandidates = getUserMovieGenreMatchCandidates(maleUsers, userMovieGenres);
         List<UserMovieGenreMatchCandidate> femaleUserMovieGenreMatchCandidates = getUserMovieGenreMatchCandidates(femaleUsers, userMovieGenres);
         // 검정
-        checkValidate(maleUserMovieGenreMatchCandidates, MatchScoreType.MALE_MOVIE_ID);
-        checkValidate(femaleUserMovieGenreMatchCandidates, MatchScoreType.FEMALE_MOVIE_ID);
+        checkValidate(maleUserMovieGenreMatchCandidates, MatchValidationType.MALE_MOVIE_ID);
+        checkValidate(femaleUserMovieGenreMatchCandidates, MatchValidationType.FEMALE_MOVIE_ID);
 
         simulatedAt = LocalDateTime.now();  // 매칭 시작 시간
 
@@ -260,7 +260,7 @@ public class MatchService {
      * @param type 검사 대상 엔티티 타입 (에러 메시지 처리용)
      * @throws GeneralException 데이터 정합성 검증 실패 시 발생
      */
-    private <T> void checkValidate(List<T> list, MatchScoreType type) {
+    private <T> void checkValidate(List<T> list, MatchValidationType type) {
         // 1. list가 비어있는지 여부 확인
         if (list.isEmpty()) {
             throw new GeneralException(type.getErrorCode());
@@ -273,7 +273,7 @@ public class MatchService {
         }
         // 3. 중복 데이터 검사
         if (new HashSet<>(list).size() != list.size()) {
-            throw new GeneralException(MatchScoreType.DUPLICATED_ID.getErrorCode());
+            throw new GeneralException(MatchValidationType.DUPLICATED_ID.getErrorCode());
         }
     }
 
