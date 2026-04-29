@@ -1,13 +1,12 @@
 package com.likelion.zooting.domain.match.service;
 
 import com.likelion.zooting.domain.match.dto.MatchRequest;
-import com.likelion.zooting.domain.match.dto.data.*;
 import com.likelion.zooting.domain.match.mapper.MatchMapper;
-import com.likelion.zooting.domain.match.policy.MatchCountPolicy;
 import com.likelion.zooting.domain.match.policy.MatchPolicy;
 import com.likelion.zooting.domain.match.policy.MatchScoreCalculatePolicy;
 import com.likelion.zooting.domain.match.policy.MatchScoreType;
 import com.likelion.zooting.domain.match.repository.MatchRepository;
+import com.likelion.zooting.domain.match.service.data.*;
 import com.likelion.zooting.domain.user.entity.Gender;
 import com.likelion.zooting.domain.user.entity.Status;
 import com.likelion.zooting.domain.user.entity.User;
@@ -35,7 +34,6 @@ import java.util.stream.IntStream;
 @RequiredArgsConstructor    // final 필드의 생성자 자동 생성
 public class MatchService {
     private final MatchPolicy matchPolicy;
-    private final MatchCountPolicy matchCountPolicy;
     private final MatchScoreCalculatePolicy matchScoreCalculatePolicy;
 
     private final MatchRepository matchRepository;

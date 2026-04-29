@@ -1,4 +1,4 @@
-package com.likelion.zooting.domain.match.dto.data;
+package com.likelion.zooting.domain.match.service.data;
 
 import java.util.List;
 
