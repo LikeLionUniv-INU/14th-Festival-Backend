@@ -18,7 +18,7 @@ public class MatchController implements MatchControllerDocs {
 
     @Override
     public ResponseEntity<ApiResponse<MatchRequest>> simulateMatch() {
-        if (LocalTime.now().isAfter(LocalTime.of(17, 0))) {   // 17시(오후 5시)이후에 요청
+        if (LocalTime.now().isBefore(LocalTime.of(17, 0))) {   // 17시(오후 5시)이후에 요청
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(
                     ApiResponse.failure("MATCH_4031", "테스트 매칭은 17시 이후에만 실행할 수 있습니다.", null));
         }
