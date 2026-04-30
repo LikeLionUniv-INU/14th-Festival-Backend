@@ -16,10 +16,10 @@ import java.util.Map;
 @RequestMapping("/api")
 public class MockController {
 
-    @PostMapping("/onboarding/instagram")
-    public ApiResponse<Void> verifyInstagram() {
-        return ApiResponse.success();
-    }
+//    @PostMapping("/onboarding/instagram")
+//    public ApiResponse<Void> verifyInstagram() {
+//        return ApiResponse.success();
+//    }
 
     @PostMapping("/onboarding/privacy")
     public ApiResponse<Void> submitPrivacy() {
