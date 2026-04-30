@@ -4,6 +4,7 @@ services:
     container_name: zooting-mysql
     restart: always
     environment:
+      JWT_SECRET_KEY: ${JWT_SECRET_KEY}
       # root 계정 생성
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
       MYSQL_DATABASE: ${MYSQL_DATABASE}
