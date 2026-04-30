@@ -2,6 +2,7 @@ package com.likelion.zooting.domain.user.controller;
 
 import com.likelion.zooting.domain.user.dto.AuthRequest;
 import com.likelion.zooting.domain.user.dto.AuthResponse;
+import com.likelion.zooting.domain.user.service.AuthService;
 import com.likelion.zooting.global.response.ApiResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

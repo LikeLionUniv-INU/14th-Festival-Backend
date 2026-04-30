@@ -4,7 +4,6 @@ services:
     container_name: zooting-mysql
     restart: always
     environment:
-      JWT_SECRET_KEY: ${JWT_SECRET_KEY}
       # root 계정 생성
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
       MYSQL_DATABASE: ${MYSQL_DATABASE}
@@ -34,6 +33,7 @@ services:
     ports:
       - "8080:8080"
     environment:
+      JWT_SECRET_KEY: ${JWT_SECRET_KEY}
       MYSQL_DATABASE: ${MYSQL_DATABASE}
       SPRING_DATASOURCE_USERNAME: ${SPRING_DATASOURCE_USERNAME}
       SPRING_DATASOURCE_PASSWORD: ${SPRING_DATASOURCE_PASSWORD}
