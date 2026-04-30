@@ -23,12 +23,12 @@ public class User {
     @Column(name = "INSTAGRAM_ID", length = 50)
     private String instagramId; // 인스타 아이디
 
-    @Column(name = "USER_PW", length = 255)
+    @Column(name = "USER_PW", length = 4)
     private String userPw;  // 사용자 PW
 
     @Enumerated(EnumType.STRING)    // 데이터 안정성을 위해, DB에 저장할 경우 문자열로 저장할 것을 명시
     @Column(name = "GENDER", length = 10)
-    private Gender gender;  // 성멸
+    private Gender gender;  // 성별
 
     @Enumerated(EnumType.STRING)    // 데이터 안정성을 위해, DB에 저장할 경우 문자열로 저장할 것을 명시
     @Column(name = "STATUS", length = 10)
@@ -38,5 +38,11 @@ public class User {
     private LocalDateTime createdAt;    // 생성 시간
 
     @Column(name = "PRIVACY_CONSENT")
-    private boolean privacyConsent; // 개인정보 동의 여부
+    private boolean privacyConsent;
+
+    public User(String instagramId, String userPw) {
+        this.instagramId = instagramId;
+        this.userPw = userPw;
+        this.status = Status.IN_PROGRESS;
+    }
 }
