@@ -45,4 +45,8 @@ public class User {
         this.userPw = userPw;
         this.status = Status.IN_PROGRESS;
     }
+
+    public void updatePrivacyConsent(Boolean privacyConsent) {
+        this.privacyConsent = privacyConsent;
+    }
 }
