@@ -19,12 +19,12 @@ public class JwtTokenProvider {
     }
 
     // AccessToken 발급
-    public String createAccessToken(String instagramId) {
+    public String createAccessToken(Long userId) {
         Date now = new Date();
         Date expiry = new Date(now.getTime() + 1000L * 60 * 30); // 30분
 
         return Jwts.builder()
-                .subject(instagramId) // 토큰에 사용자 식별값 저장
+                .subject(String.valueOf(userId)) // 토큰에 사용자 식별값 저장
                 .issuedAt(now)
                 .expiration(expiry)
                 .signWith(secretKey)
@@ -32,13 +32,13 @@ public class JwtTokenProvider {
     }
 
     // 토큰에서 사용자 식별값(instagramId) 추출
-    public String getInstagramId(String token) {
-        return Jwts.parser()
+    public Long getUserId(String token) {
+        return Long.valueOf(Jwts.parser()
                 .verifyWith(secretKey)
                 .build()
                 .parseSignedClaims(token)
                 .getPayload()
-                .getSubject();
+                .getSubject());
     }
 
     // 토큰 유효성 검증

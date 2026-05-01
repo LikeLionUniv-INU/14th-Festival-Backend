@@ -32,11 +32,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             String token = bearer.substring(7);
 
             if (jwtTokenProvider.validateToken(token)) {
-                String instagramId = jwtTokenProvider.getInstagramId(token);
+                Long userId = jwtTokenProvider.getUserId(token);
+
+                request.setAttribute("userId", userId);
 
                 UsernamePasswordAuthenticationToken authentication =
                         new UsernamePasswordAuthenticationToken(
-                                instagramId,
+                                userId,
                                 null,
                                 AuthorityUtils.NO_AUTHORITIES
                         );

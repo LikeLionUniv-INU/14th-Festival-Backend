@@ -37,7 +37,7 @@ public class AuthService {
             throw new GeneralException(UserErrorCode.ALREADY_COMPLETED);
         }
 
-        String accessToken = jwtTokenProvider.createAccessToken(user.getInstagramId());
+        String accessToken = jwtTokenProvider.createAccessToken(user.getUserId());
         return authMapper.toAuthResponse(user, accessToken);
     }
 
@@ -45,7 +45,7 @@ public class AuthService {
         User newUser = authMapper.toEntity(request);
         User savedUser = userRepository.save(newUser);
 
-        String accessToken = jwtTokenProvider.createAccessToken(savedUser.getInstagramId());
+        String accessToken = jwtTokenProvider.createAccessToken(savedUser.getUserId());
         return authMapper.toAuthResponse(savedUser, accessToken);
     }
 
