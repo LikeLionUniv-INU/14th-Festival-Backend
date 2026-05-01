@@ -7,12 +7,14 @@ import com.likelion.zooting.global.exception.GeneralException;
 import com.likelion.zooting.global.response.ApiResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalTime;
 
 @RestController
 @RequiredArgsConstructor
+@RequestMapping("/api/internal/match")
 public class MatchController implements MatchControllerDocs {
     private final MatchService matchService;
 
@@ -32,7 +34,11 @@ public class MatchController implements MatchControllerDocs {
 
     // 공통 검증 로직
     private void validateMatchTime() {
-        if (LocalTime.now().isBefore(LocalTime.of(17, 0))) { // 17시 이전이면 예외 발생
+        // 서버의 현재 시간 (UTC)
+        LocalTime serverNow = LocalTime.now();
+
+        // 서버 시간 기준 08:00 ~ 15:00 사이가 아니라면 (= 한국 시간 17:00 ~ 24:00가 아니라면)
+        if (serverNow.isBefore(LocalTime.of(8, 0)) || serverNow.isAfter(LocalTime.of(15, 0))) {
             throw new GeneralException(MatchInnerErrorCode.MATCH_TIME_FORBIDDEN);
         }
     }

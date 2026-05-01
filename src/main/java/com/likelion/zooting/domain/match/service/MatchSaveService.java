@@ -17,9 +17,10 @@ import java.util.List;
 import java.util.Map;
 
 @Component
-public class MatchSaveService extends MatchCandidateConvertorByMap {
+public class MatchSaveService {    // 이부분 수정(extends)
     MatchRepository matchRepository;
     MatchCountPolicy matchCountPolicy;
+    MatchCandidateConvertorByMap matchCandidateConvertorByMap;
 
     /**
      * 시뮬레이션 결과를 토대로 매칭된 쌍들을 DB에 저장합니다.
@@ -62,14 +63,14 @@ public class MatchSaveService extends MatchCandidateConvertorByMap {
         }
 
 
-        Map<Long, Long> maleUserAnimalMap = animalCandidateToMap(maleUserAnimalMatchCandidates);
-        Map<Long, Long> femaleUserAnimalMap = animalCandidateToMap(femaleUserAnimalMatchCandidates);
-        Map<Long, List<Long>> maleUserPreferredAnimalMap = preferredAnimalCandidateToMap(maleUserAnimalMatchCandidates);
-        Map<Long, List<Long>> femaleUserPreferredAnimalMap = preferredAnimalCandidateToMap(femaleUserAnimalMatchCandidates);
-        Map<Long, List<Long>> maleUserInterestMap = interestCandidateToMap(maleUserInterestMatchCandidates);
-        Map<Long, List<Long>> femaleUserInterestMap = interestCandidateToMap(femaleUserInterestMatchCandidates);
-        Map<Long, List<Long>> maleUserMovieGenreMap = movieGenreCandidateToMap(maleUserMovieGenreMatchCandidates);
-        Map<Long, List<Long>> femaleUserMovieGenreMap = movieGenreCandidateToMap(femaleUserMovieGenreMatchCandidates);
+        Map<Long, Long> maleUserAnimalMap = matchCandidateConvertorByMap.animalCandidateToMap(maleUserAnimalMatchCandidates);
+        Map<Long, Long> femaleUserAnimalMap = matchCandidateConvertorByMap.animalCandidateToMap(femaleUserAnimalMatchCandidates);
+        Map<Long, List<Long>> maleUserPreferredAnimalMap = matchCandidateConvertorByMap.preferredAnimalCandidateToMap(maleUserAnimalMatchCandidates);
+        Map<Long, List<Long>> femaleUserPreferredAnimalMap = matchCandidateConvertorByMap.preferredAnimalCandidateToMap(femaleUserAnimalMatchCandidates);
+        Map<Long, List<Long>> maleUserInterestMap = matchCandidateConvertorByMap.interestCandidateToMap(maleUserInterestMatchCandidates);
+        Map<Long, List<Long>> femaleUserInterestMap = matchCandidateConvertorByMap.interestCandidateToMap(femaleUserInterestMatchCandidates);
+        Map<Long, List<Long>> maleUserMovieGenreMap = matchCandidateConvertorByMap.movieGenreCandidateToMap(maleUserMovieGenreMatchCandidates);
+        Map<Long, List<Long>> femaleUserMovieGenreMap = matchCandidateConvertorByMap.movieGenreCandidateToMap(femaleUserMovieGenreMatchCandidates);
 
         List<Match> pairs = finalMatchedPairList.stream()
                 .map(pair -> new MatchedPair(
