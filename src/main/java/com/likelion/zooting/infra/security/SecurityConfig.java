@@ -33,6 +33,8 @@ public class SecurityConfig {
                         .requestMatchers(
                                 "/swagger-ui/**",
                                 "/v3/api-docs/**",
+                                "/actuator/health",
+                                "/actuator/prometheus",
                                 "/api/onboarding/instagram"
                         ).permitAll()
                         .anyRequest().authenticated()
