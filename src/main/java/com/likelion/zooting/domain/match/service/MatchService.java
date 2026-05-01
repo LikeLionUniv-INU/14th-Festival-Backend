@@ -1,11 +1,10 @@
 package com.likelion.zooting.domain.match.service;
 
-import com.likelion.zooting.domain.match.dto.MatchRequest;
+import com.likelion.zooting.domain.match.dto.MatchResponse;
+import com.likelion.zooting.domain.match.exception.MatchErrorCode;
 import com.likelion.zooting.domain.match.policy.MatchPolicy;
 import com.likelion.zooting.domain.match.policy.MatchScoreCalculatePolicy;
-import com.likelion.zooting.domain.match.policy.MatchValidationType;
-import com.likelion.zooting.domain.match.service.converter.MatchCandidatesConverter;
-import com.likelion.zooting.domain.match.service.converter.MatchDataConverter;
+import com.likelion.zooting.domain.match.service.converter.MatchCandidatesConverterByList;
 import com.likelion.zooting.domain.match.service.converter.MatchUserConverter;
 import com.likelion.zooting.domain.match.service.data.TempMatchResult;
 import com.likelion.zooting.domain.match.service.data.UserAnimalMatchCandidate;
@@ -21,6 +20,8 @@ import com.likelion.zooting.domain.usermoviegenre.entity.UserMovieGenre;
 import com.likelion.zooting.domain.usermoviegenre.repository.UserMovieGenreRepository;
 import com.likelion.zooting.domain.userpreferredanimaltype.entity.UserPreferredAnimalType;
 import com.likelion.zooting.domain.userpreferredanimaltype.repository.UserPreferredAnimalTypeRepository;
+import com.likelion.zooting.global.exception.GeneralException;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -30,7 +31,7 @@ import java.util.Map;
 
 @Service
 @RequiredArgsConstructor    // final 필드의 생성자 자동 생성
-public class MatchService extends MatchSaveService {
+public class MatchService {
     private final MatchPolicy matchPolicy;
     private final MatchScoreCalculatePolicy matchScoreCalculatePolicy;
     private final UserRepository userRepository;
@@ -38,9 +39,8 @@ public class MatchService extends MatchSaveService {
     private final UserInterestRepository userInterestRepository;
     private final UserMovieGenreRepository userMovieGenreRepository;
     private final MatchUserConverter matchUserConverter;
-    private final MatchDataConverter matchDataConverter;
-    private final MatchCandidatesConverter matchCandidatesConverter;
-    private final MatchValidateService matchValidateService;
+    private final MatchCandidatesConverterByList matchCandidatesConverter;
+    private final MatchSaveService matchSaveService;
 
     /**
      * 매칭 시뮬레이션을 수행하고 최종 결과를 반환합니다.
@@ -72,27 +72,21 @@ public class MatchService extends MatchSaveService {
      * @param isSave DB 저장 여부 (true: 저장 수행, false: 시뮬레이션 결과만 반환)
      * @return 매칭 결과 통계 및 정보가 담긴 DTO
      */
-    public MatchRequest getResultOfMatching(boolean isSave) {
+    @Transactional
+    public MatchResponse getResultOfMatching(boolean isSave) {
+
         // 매칭 결과
         TempMatchResult simulatedMatchResult;
         LocalDateTime simulatedAt;
 
-
         // repository에서 사용자 데이터 가져오기
         List<User> maleUsers = userRepository.findByGenderAndStatus(Gender.MALE, Status.SUBMITTED);
         List<User> femaleUsers = userRepository.findByGenderAndStatus(Gender.FEMALE, Status.SUBMITTED);
-        // 검정
-        matchValidateService.checkValidate(maleUsers, MatchValidationType.MALE_USER_ID);
-        matchValidateService.checkValidate(femaleUsers, MatchValidationType.FEMALE_USER_ID);
 
         // repository에서 사용자 관련 데이터(선호 동물상, 관심사, 영화 장르) 가져오기
         List<UserPreferredAnimalType> userPreferredAnimalTypes = userPreferredAnimalTypeRepository.findAll();
         List<UserInterest> userInterests = userInterestRepository.findAll();
         List<UserMovieGenre> userMovieGenres = userMovieGenreRepository.findAll();
-        // 검정
-        matchValidateService.checkValidate(userPreferredAnimalTypes, MatchValidationType.PREFERRED_ANiMAL_ID);
-        matchValidateService.checkValidate(userInterests, MatchValidationType.INTEREST_ID);
-        matchValidateService.checkValidate(userMovieGenres, MatchValidationType.MOVIE_ID);
 
         // 사용자 ID -> index
         // 다른 데이터의 유입은 없으며, 사용자에 대한 검정은 거쳤으므로 해당 검정 과정은 넘어간다.
@@ -107,23 +101,14 @@ public class MatchService extends MatchSaveService {
         // 동물상과 관심 동물상, 사용자를 매핑한 리스트
         List<UserAnimalMatchCandidate> maleUserAnimalMatchCandidates = matchCandidatesConverter.getUserAnimalMatchCandidates(maleUsers, userPreferredAnimalTypes);
         List<UserAnimalMatchCandidate> femaleUserAnimalMatchCandidates = matchCandidatesConverter.getUserAnimalMatchCandidates(femaleUsers, userPreferredAnimalTypes);
-        // 검정
-        matchValidateService.checkValidate(maleUserAnimalMatchCandidates, MatchValidationType.MALE_PREFERRED_ANiMAL_ID);
-        matchValidateService.checkValidate(femaleUserAnimalMatchCandidates, MatchValidationType.FEMALE_PREFERRED_ANiMAL_ID);
 
         // 관심사와 사용자 매핑한 리스트
         List<UserInterestMatchCandidate> maleUserInterestMatchCandidates = matchCandidatesConverter.getUserInterestMatchCandidates(maleUsers, userInterests);
         List<UserInterestMatchCandidate> femaleUserInterestMatchCandidates = matchCandidatesConverter.getUserInterestMatchCandidates(femaleUsers, userInterests);
-        // 검정
-        matchValidateService.checkValidate(maleUserInterestMatchCandidates, MatchValidationType.MALE_INTEREST_ID);
-        matchValidateService.checkValidate(femaleUserInterestMatchCandidates, MatchValidationType.FEMALE_INTEREST_ID);
 
         // 영화 장르와 사용자 매핑한 리스트
         List<UserMovieGenreMatchCandidate> maleUserMovieGenreMatchCandidates = matchCandidatesConverter.getUserMovieGenreMatchCandidates(maleUsers, userMovieGenres);
         List<UserMovieGenreMatchCandidate> femaleUserMovieGenreMatchCandidates = matchCandidatesConverter.getUserMovieGenreMatchCandidates(femaleUsers, userMovieGenres);
-        // 검정
-        matchValidateService.checkValidate(maleUserMovieGenreMatchCandidates, MatchValidationType.MALE_MOVIE_ID);
-        matchValidateService.checkValidate(femaleUserMovieGenreMatchCandidates, MatchValidationType.FEMALE_MOVIE_ID);
 
         simulatedAt = LocalDateTime.now();  // 매칭 시작 시간
 
@@ -138,9 +123,14 @@ public class MatchService extends MatchSaveService {
         // 매칭 (greedy algorithm)
         simulatedMatchResult = matchPolicy.simulateMatching(scoreBoard, indexToMaleUserId, indexToFemaleUserId);
 
+        // 매칭이 하나도 되지 않을 경우
+        if (simulatedMatchResult.finalMatchedPairList().isEmpty()) {
+            throw new GeneralException(MatchErrorCode.NO_MATCHED_USER_CANDIDATES);
+        }
+
         // 만일 매칭 결과 저장할 경우
         if (isSave) {
-            if (saveResultOfMatch(simulatedMatchResult.finalMatchedPairList(),
+            matchSaveService.saveResultOfMatch(simulatedMatchResult.finalMatchedPairList(),
                     maleUsers,
                     femaleUsers,
                     maleUserAnimalMatchCandidates,
@@ -148,12 +138,15 @@ public class MatchService extends MatchSaveService {
                     maleUserInterestMatchCandidates,
                     femaleUserInterestMatchCandidates,
                     maleUserMovieGenreMatchCandidates,
-                    femaleUserMovieGenreMatchCandidates)) {
-
-            }
+                    femaleUserMovieGenreMatchCandidates);
         }
 
-        return MatchRequest.builder().totalUserCount(simulatedMatchResult.totalUserCount()).matchedPairCount(simulatedMatchResult.matchedPairCount()).unmatchedUserCount(simulatedMatchResult.unmatchedUserCount()).simulatedAt(simulatedAt).build();
-    }
+        return MatchResponse.builder()
+                .totalUserCount(simulatedMatchResult.totalUserCount())
+                .matchedPairCount(simulatedMatchResult.matchedPairCount())
+                .unmatchedUserCount(simulatedMatchResult.unmatchedUserCount())
+                .simulatedAt(simulatedAt).build();
 
+
+    }
 }
