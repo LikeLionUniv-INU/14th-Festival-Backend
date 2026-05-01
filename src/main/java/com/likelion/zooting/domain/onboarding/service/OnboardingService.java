@@ -35,7 +35,7 @@ public class OnboardingService {
 
     for (String animalName : preferredList) {
       // AnimalTypeRepository에 findByName 메서드가 반드시 있어야 합니다!
-      AnimalType animalType = animalTypeRepository.findByName(animalName)
+      AnimalType animalType = animalTypeRepository.findByAnimalName(animalName)
           .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 동물상: " + animalName));
 
       // 생성자 호출
