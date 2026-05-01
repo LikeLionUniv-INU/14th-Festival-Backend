@@ -32,7 +32,7 @@ import java.util.Map;
 
 @Service
 @RequiredArgsConstructor    // final 필드의 생성자 자동 생성
-public class MatchService extends MatchSaveService {
+public class MatchService {
     private final MatchPolicy matchPolicy;
     private final MatchScoreCalculatePolicy matchScoreCalculatePolicy;
     private final UserRepository userRepository;
@@ -42,6 +42,7 @@ public class MatchService extends MatchSaveService {
     private final MatchUserConverter matchUserConverter;
     private final MatchCandidatesConverterByList matchCandidatesConverter;
     private final MatchValidateService matchValidateService;
+    private final MatchSaveService matchSaveService;
 
     /**
      * 매칭 시뮬레이션을 수행하고 최종 결과를 반환합니다.
@@ -75,6 +76,7 @@ public class MatchService extends MatchSaveService {
      */
     @Transactional
     public MatchRequest getResultOfMatching(boolean isSave) {
+
         // 매칭 결과
         TempMatchResult simulatedMatchResult;
         LocalDateTime simulatedAt;
@@ -82,6 +84,7 @@ public class MatchService extends MatchSaveService {
         // repository에서 사용자 데이터 가져오기
         List<User> maleUsers = userRepository.findByGenderAndStatus(Gender.MALE, Status.SUBMITTED);
         List<User> femaleUsers = userRepository.findByGenderAndStatus(Gender.FEMALE, Status.SUBMITTED);
+
         // 검정
         matchValidateService.checkValidate(maleUsers, MatchValidationType.MALE_USER_ID);
         matchValidateService.checkValidate(femaleUsers, MatchValidationType.FEMALE_USER_ID);
@@ -146,7 +149,7 @@ public class MatchService extends MatchSaveService {
 
         // 만일 매칭 결과 저장할 경우
         if (isSave) {
-            saveResultOfMatch(simulatedMatchResult.finalMatchedPairList(),
+            matchSaveService.saveResultOfMatch(simulatedMatchResult.finalMatchedPairList(),
                     maleUsers,
                     femaleUsers,
                     maleUserAnimalMatchCandidates,
@@ -162,5 +165,7 @@ public class MatchService extends MatchSaveService {
                 .matchedPairCount(simulatedMatchResult.matchedPairCount())
                 .unmatchedUserCount(simulatedMatchResult.unmatchedUserCount())
                 .simulatedAt(simulatedAt).build();
+
+
     }
 }

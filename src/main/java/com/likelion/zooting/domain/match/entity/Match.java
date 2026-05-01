@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)  // JPA만 접근 가능
-@Table(name = "MATCH")
+@Table(name = "MATCHES")
 public class Match {
     /**
      * {@link Match} 엔티티 생성을 위한 정적 팩토리 메서드입니다.
@@ -56,11 +56,9 @@ public class Match {
     @Column(name = "INTEREST_NUM")
     private Integer interestNum;    // 관심사 일치 개수
 
-    @Column(name = "movie_num")
+    @Column(name = "MOVIE_NUM")
     private Integer movieNum;   // 영화 장르 일치 개수
 
-    @Column(name = "score")
+    @Column(name = "SCORE")
     private Integer score;  // 매칭 점수
 }
-
-

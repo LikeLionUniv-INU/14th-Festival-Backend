@@ -20,7 +20,7 @@ public class MatchController implements MatchControllerDocs {
 
     @Override
     public ResponseEntity<ApiResponse<MatchRequest>> simulateMatch() {
-        validateMatchTime(); // 시간 검증 로직 분리
+        // validateMatchTime(); // 시간 검증 로직 분리
         // 시뮬레이션이므로 저장은 하지 않음 (false)
         return ResponseEntity.ok(ApiResponse.success(matchService.getResultOfMatching(false)));
     }

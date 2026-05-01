@@ -3,11 +3,14 @@ package com.likelion.zooting.domain.match.service.converter;
 import com.likelion.zooting.domain.match.service.data.UserAnimalMatchCandidate;
 import com.likelion.zooting.domain.match.service.data.UserInterestMatchCandidate;
 import com.likelion.zooting.domain.match.service.data.UserMovieGenreMatchCandidate;
+import io.swagger.v3.oas.annotations.Parameter;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+@Component
 public class MatchCandidateConvertorByMap {
     /**
      * 사용자별 동물상 데이터에 대한 조회 효율을 위해 Map 구조로 변환한다.
@@ -16,7 +19,11 @@ public class MatchCandidateConvertorByMap {
      * @return (사용자 ID -> 동물상 ID) Map
      */
     public Map<Long, Long> animalCandidateToMap(List<UserAnimalMatchCandidate> userAnimalMatchCandidates) {
-        return userAnimalMatchCandidates.stream().collect(Collectors.toMap(uamc -> uamc.userId(), uamc -> uamc.animalTypeId()));
+        return userAnimalMatchCandidates.stream()
+                .collect(Collectors.toMap(
+                        uamc -> uamc.userId(),
+                        uamc -> uamc.animalTypeId(),
+                        (existing, replacement) -> existing));
     }
 
     /**

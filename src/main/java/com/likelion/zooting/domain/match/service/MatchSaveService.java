@@ -11,16 +11,20 @@ import com.likelion.zooting.domain.user.entity.Status;
 import com.likelion.zooting.domain.user.entity.User;
 import com.likelion.zooting.global.exception.GeneralException;
 import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Map;
 
 @Component
+@RequiredArgsConstructor
 public class MatchSaveService {    // 이부분 수정(extends)
-    MatchRepository matchRepository;
-    MatchCountPolicy matchCountPolicy;
-    MatchCandidateConvertorByMap matchCandidateConvertorByMap;
+    private final MatchRepository matchRepository;
+    private final MatchCountPolicy matchCountPolicy;
+    private final MatchCandidateConvertorByMap matchCandidateConvertorByMap;
+    private Logger log;
 
     /**
      * 시뮬레이션 결과를 토대로 매칭된 쌍들을 DB에 저장합니다.
