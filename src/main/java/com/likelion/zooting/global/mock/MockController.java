@@ -21,10 +21,10 @@ public class MockController {
 //        return ApiResponse.success();
 //    }
 
-    @PostMapping("/onboarding/privacy")
-    public ApiResponse<Void> submitPrivacy() {
-        return ApiResponse.success();
-    }
+//    @PostMapping("/onboarding/privacy")
+//    public ApiResponse<Void> submitPrivacy() {
+//        return ApiResponse.success();
+//    }
 
     @PostMapping("/onboarding/submit")
     public ApiResponse<Void> submitOnboarding() {
