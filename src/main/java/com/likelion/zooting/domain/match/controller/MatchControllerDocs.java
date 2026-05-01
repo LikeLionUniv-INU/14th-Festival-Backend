@@ -1,6 +1,6 @@
 package com.likelion.zooting.domain.match.controller;
 
-import com.likelion.zooting.domain.match.dto.MatchRequest;
+import com.likelion.zooting.domain.match.dto.MatchResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -23,7 +23,7 @@ public interface MatchControllerDocs {
             @ApiResponse(
                     responseCode = "200",
                     description = "매칭 실행 성공",
-                    content = @Content(schema = @Schema(implementation = MatchRequest.class))
+                    content = @Content(schema = @Schema(implementation = MatchResponse.class))
             ),
             @ApiResponse(
                     responseCode = "403",
@@ -37,7 +37,7 @@ public interface MatchControllerDocs {
             )
     })
     @PostMapping("/simulate")
-    ResponseEntity<com.likelion.zooting.global.response.ApiResponse<MatchRequest>> simulateMatch();
+    ResponseEntity<com.likelion.zooting.global.response.ApiResponse<MatchResponse>> simulateMatch();
 
     @Operation(
             summary = "매칭 시뮬레이션(저장)",
@@ -47,7 +47,7 @@ public interface MatchControllerDocs {
             @ApiResponse(
                     responseCode = "200",
                     description = "매칭 실행 성공",
-                    content = @Content(schema = @Schema(implementation = MatchRequest.class))
+                    content = @Content(schema = @Schema(implementation = MatchResponse.class))
             ),
             @ApiResponse(
                     responseCode = "403",
@@ -66,5 +66,5 @@ public interface MatchControllerDocs {
             )
     })
     @PostMapping("/run")
-    ResponseEntity<com.likelion.zooting.global.response.ApiResponse<MatchRequest>> runMatch();
+    ResponseEntity<com.likelion.zooting.global.response.ApiResponse<MatchResponse>> runMatch();
 }

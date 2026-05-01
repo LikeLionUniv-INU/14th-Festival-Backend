@@ -1,6 +1,6 @@
 package com.likelion.zooting.domain.match.controller;
 
-import com.likelion.zooting.domain.match.dto.MatchRequest;
+import com.likelion.zooting.domain.match.dto.MatchResponse;
 import com.likelion.zooting.domain.match.exception.MatchInnerErrorCode;
 import com.likelion.zooting.domain.match.service.MatchService;
 import com.likelion.zooting.global.exception.GeneralException;
@@ -19,17 +19,23 @@ public class MatchController implements MatchControllerDocs {
     private final MatchService matchService;
 
     @Override
-    public ResponseEntity<ApiResponse<MatchRequest>> simulateMatch() {
-        // validateMatchTime(); // 시간 검증 로직 분리
+    public ResponseEntity<ApiResponse<MatchResponse>> simulateMatch() {
+        // 시간 검증 로직 분리
+        validateMatchTime();
         // 시뮬레이션이므로 저장은 하지 않음 (false)
-        return ResponseEntity.ok(ApiResponse.success(matchService.getResultOfMatching(false)));
+        MatchResponse matchResponse = matchService.getResultOfMatching(false);
+        isEmptyMatchResult(matchResponse.matchedPairCount());
+        return ResponseEntity.ok(ApiResponse.success(matchResponse));
     }
 
     @Override
-    public ResponseEntity<ApiResponse<MatchRequest>> runMatch() {
+    public ResponseEntity<ApiResponse<MatchResponse>> runMatch() {
+        // 시간 검증 로직 분리
         validateMatchTime();
         // 실제 실행이므로 저장 (true)
-        return ResponseEntity.ok(ApiResponse.success(matchService.getResultOfMatching(true)));
+        MatchResponse matchResponse = matchService.getResultOfMatching(true);
+        isEmptyMatchResult(matchResponse.matchedPairCount());
+        return ResponseEntity.ok(ApiResponse.success(matchResponse));
     }
 
     // 공통 검증 로직
@@ -41,5 +47,9 @@ public class MatchController implements MatchControllerDocs {
         if (serverNow.isBefore(LocalTime.of(8, 0)) || serverNow.isAfter(LocalTime.of(15, 0))) {
             throw new GeneralException(MatchInnerErrorCode.MATCH_TIME_FORBIDDEN);
         }
+    }
+
+    private void isEmptyMatchResult(Integer matchPairCount){
+        throw new GeneralException(MatchInnerErrorCode.NO_MATCHED_USER_CANDIDATES);
     }
 }

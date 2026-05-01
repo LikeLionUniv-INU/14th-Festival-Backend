@@ -1,6 +1,6 @@
 package com.likelion.zooting.domain.match.service;
 
-import com.likelion.zooting.domain.match.entity.Match;
+import com.likelion.zooting.domain.match.entity.Matches;
 import com.likelion.zooting.domain.match.exception.MatchInnerErrorCode;
 import com.likelion.zooting.domain.match.policy.MatchCountPolicy;
 import com.likelion.zooting.domain.match.repository.MatchRepository;
@@ -76,13 +76,13 @@ public class MatchSaveService {    // 이부분 수정(extends)
         Map<Long, List<Long>> maleUserMovieGenreMap = matchCandidateConvertorByMap.movieGenreCandidateToMap(maleUserMovieGenreMatchCandidates);
         Map<Long, List<Long>> femaleUserMovieGenreMap = matchCandidateConvertorByMap.movieGenreCandidateToMap(femaleUserMovieGenreMatchCandidates);
 
-        List<Match> pairs = finalMatchedPairList.stream()
+        List<Matches> pairs = finalMatchedPairList.stream()
                 .map(pair -> new MatchedPair(
                         maleUsers.get(pair.maleUserIndex()),
                         femaleUsers.get(pair.femaleUserIndex()),
                         pair.score()
                 ))
-                .map(pair -> Match.create(
+                .map(pair -> Matches.create(
                         pair.maleUser(),
                         pair.femaleUser(),
                         matchCountPolicy.getAnimalTypeCount(pair,

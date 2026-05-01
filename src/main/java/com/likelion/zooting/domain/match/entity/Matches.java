@@ -10,9 +10,9 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)  // JPA만 접근 가능
 @Table(name = "MATCHES")
-public class Match {
+public class Matches {
     /**
-     * {@link Match} 엔티티 생성을 위한 정적 팩토리 메서드입니다.
+     * {@link Matches} 엔티티 생성을 위한 정적 팩토리 메서드입니다.
      * <p>
      * 외부에서 생성자를 통한 직접적인 객체 생성을 제한(Access Control)하고,
      * 매칭에 필요한 모든 필드를 한 번에 주입받아 객체의 원자성(Atomicity)을 보장합니다.
@@ -26,15 +26,15 @@ public class Match {
      * @param score       총 매칭 점수
      * @return 매칭 정보가 완성된 Match 인스턴스
      */
-    public static Match create(User maleUser, User femaleUser, Integer animalNum, Integer interestNum, Integer movieNum, Integer score) {
-        Match match = new Match();
-        match.maleUser = maleUser;
-        match.femaleUser = femaleUser;
-        match.animalNum = animalNum;
-        match.interestNum = interestNum;
-        match.movieNum = movieNum;
-        match.score = score;
-        return match;
+    public static Matches create(User maleUser, User femaleUser, Integer animalNum, Integer interestNum, Integer movieNum, Integer score) {
+        Matches matches = new Matches();
+        matches.maleUser = maleUser;
+        matches.femaleUser = femaleUser;
+        matches.animalNum = animalNum;
+        matches.interestNum = interestNum;
+        matches.movieNum = movieNum;
+        matches.score = score;
+        return matches;
     }
 
     @Id
