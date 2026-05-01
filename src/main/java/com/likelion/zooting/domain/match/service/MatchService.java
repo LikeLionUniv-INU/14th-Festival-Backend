@@ -1,7 +1,7 @@
 package com.likelion.zooting.domain.match.service;
 
 import com.likelion.zooting.domain.match.dto.MatchResponse;
-import com.likelion.zooting.domain.match.exception.MatchInnerErrorCode;
+import com.likelion.zooting.domain.match.exception.MatchErrorCode;
 import com.likelion.zooting.domain.match.policy.MatchPolicy;
 import com.likelion.zooting.domain.match.policy.MatchScoreCalculatePolicy;
 import com.likelion.zooting.domain.match.service.converter.MatchCandidatesConverterByList;
@@ -125,7 +125,7 @@ public class MatchService {
 
         // 매칭이 하나도 되지 않을 경우
         if (simulatedMatchResult.finalMatchedPairList().isEmpty()) {
-            throw new GeneralException(MatchInnerErrorCode.NO_MATCHED_USER_CANDIDATES);
+            throw new GeneralException(MatchErrorCode.NO_MATCHED_USER_CANDIDATES);
         }
 
         // 만일 매칭 결과 저장할 경우

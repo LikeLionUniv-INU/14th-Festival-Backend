@@ -1,7 +1,7 @@
 package com.likelion.zooting.domain.match.service;
 
 import com.likelion.zooting.domain.match.entity.Matches;
-import com.likelion.zooting.domain.match.exception.MatchInnerErrorCode;
+import com.likelion.zooting.domain.match.exception.MatchErrorCode;
 import com.likelion.zooting.domain.match.policy.MatchCountPolicy;
 import com.likelion.zooting.domain.match.repository.MatchRepository;
 import com.likelion.zooting.domain.match.service.converter.MatchCandidateConvertorByMap;
@@ -63,7 +63,7 @@ public class MatchSaveService {    // 이부분 수정(extends)
                                   List<UserMovieGenreMatchCandidate> femaleUserMovieGenreMatchCandidates) {
         // 이미 한 번 실행한건가?-> DB에 남성 사용자에 대해 저장되어 있는 여부로 확인
         if (matchRepository.existsByMaleUser_GenderAndMaleUser_Status(Gender.MALE, Status.SUBMITTED)) {
-            throw new GeneralException(MatchInnerErrorCode.DUPLICATE_EXECUTION_OF_MATCH_SAVE);
+            throw new GeneralException(MatchErrorCode.DUPLICATE_EXECUTION_OF_MATCH_SAVE);
         }
 
 

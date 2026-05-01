@@ -1,7 +1,7 @@
 package com.likelion.zooting.domain.match.controller;
 
 import com.likelion.zooting.domain.match.dto.MatchResponse;
-import com.likelion.zooting.domain.match.exception.MatchInnerErrorCode;
+import com.likelion.zooting.domain.match.exception.MatchErrorCode;
 import com.likelion.zooting.domain.match.service.MatchService;
 import com.likelion.zooting.global.exception.GeneralException;
 import com.likelion.zooting.global.response.ApiResponse;
@@ -45,11 +45,11 @@ public class MatchController implements MatchControllerDocs {
 
         // 서버 시간 기준 08:00 ~ 15:00 사이가 아니라면 (= 한국 시간 17:00 ~ 24:00가 아니라면)
         if (serverNow.isBefore(LocalTime.of(8, 0)) || serverNow.isAfter(LocalTime.of(15, 0))) {
-            throw new GeneralException(MatchInnerErrorCode.MATCH_TIME_FORBIDDEN);
+            throw new GeneralException(MatchErrorCode.MATCH_TIME_FORBIDDEN);
         }
     }
 
     private void isEmptyMatchResult(Integer matchPairCount){
-        throw new GeneralException(MatchInnerErrorCode.NO_MATCHED_USER_CANDIDATES);
+        throw new GeneralException(MatchErrorCode.NO_MATCHED_USER_CANDIDATES);
     }
 }
