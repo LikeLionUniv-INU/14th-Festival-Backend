@@ -50,6 +50,8 @@ public class MatchController implements MatchControllerDocs {
     }
 
     private void isEmptyMatchResult(Integer matchPairCount){
-        throw new GeneralException(MatchErrorCode.NO_MATCHED_USER_CANDIDATES);
+        if(matchPairCount <= 0){
+            throw new GeneralException(MatchErrorCode.NO_MATCHED_USER_CANDIDATES);
+        }
     }
 }
