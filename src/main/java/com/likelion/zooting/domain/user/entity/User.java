@@ -49,4 +49,8 @@ public class User {
     public void updatePrivacyConsent(Boolean privacyConsent) {
         this.privacyConsent = privacyConsent;
     }
+
+    public void updateStatus(Status status) {
+        this.status = status;
+    }
 }
