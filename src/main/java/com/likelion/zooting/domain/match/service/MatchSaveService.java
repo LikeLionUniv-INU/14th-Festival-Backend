@@ -5,6 +5,7 @@ import com.likelion.zooting.domain.match.exception.MatchErrorCode;
 import com.likelion.zooting.domain.match.policy.MatchCountPolicy;
 import com.likelion.zooting.domain.match.repository.MatchRepository;
 import com.likelion.zooting.domain.match.service.converter.MatchCandidateConvertorByMap;
+import com.likelion.zooting.domain.match.service.converter.TempMathConverterByMatchedPair;
 import com.likelion.zooting.domain.match.service.data.*;
 import com.likelion.zooting.domain.user.entity.Gender;
 import com.likelion.zooting.domain.user.entity.Status;
@@ -12,7 +13,6 @@ import com.likelion.zooting.domain.user.entity.User;
 import com.likelion.zooting.global.exception.GeneralException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.slf4j.Logger;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -24,7 +24,7 @@ public class MatchSaveService {    // 이부분 수정(extends)
     private final MatchRepository matchRepository;
     private final MatchCountPolicy matchCountPolicy;
     private final MatchCandidateConvertorByMap matchCandidateConvertorByMap;
-    private Logger log;
+    private final TempMathConverterByMatchedPair tempMathConverterByMatchedPair;
 
     /**
      * 시뮬레이션 결과를 토대로 매칭된 쌍들을 DB에 저장합니다.
@@ -41,6 +41,12 @@ public class MatchSaveService {    // 이부분 수정(extends)
      * <li>생성일자가 아니더라도, 우리가 알 수 있는 값이면 무엇이든 가능하다.</li>
      * </ul>
      *
+     * <p><b>[사용자 상태 전환]</b></p>
+     * <ul>
+     * <li>매칭 성공 : <b>SUBMITTED</b> -> <b>MATCHED</b></li>
+     * <li>매칭 실패에 대해선 이력 관리 부분에서 처리한다.
+     * </ul>
+     *
      * @param finalMatchedPairList                시뮬레이션 결과물(누가 몇 점으로 매칭되었는지만 담고 있다.)
      * @param maleUsers                           남성 사용자
      * @param femaleUsers                         여성 사용자
@@ -50,6 +56,7 @@ public class MatchSaveService {    // 이부분 수정(extends)
      * @param femaleUserInterestMatchCandidates   여성 사용자와 관심사 매칭 후보들
      * @param maleUserMovieGenreMatchCandidates   남성 사용자와 영화 장르 매칭 후보들
      * @param femaleUserMovieGenreMatchCandidates 여성 사용자와 영화 장르 매칭 후보들
+     *
      */
     @Transactional  // -> public써야 한다.
     public void saveResultOfMatch(List<TempMatch> finalMatchedPairList,
@@ -62,7 +69,7 @@ public class MatchSaveService {    // 이부분 수정(extends)
                                   List<UserMovieGenreMatchCandidate> maleUserMovieGenreMatchCandidates,
                                   List<UserMovieGenreMatchCandidate> femaleUserMovieGenreMatchCandidates) {
         // 이미 한 번 실행한건가?-> DB에 남성 사용자에 대해 저장되어 있는 여부로 확인
-        if (matchRepository.existsByMaleUser_GenderAndMaleUser_Status(Gender.MALE, Status.SUBMITTED)) {
+        if (matchRepository.existsByMaleUser_GenderAndMaleUser_Status(Gender.MALE, Status.MATCHED)) {
             throw new GeneralException(MatchErrorCode.DUPLICATE_EXECUTION_OF_MATCH_SAVE);
         }
 
@@ -77,11 +84,9 @@ public class MatchSaveService {    // 이부분 수정(extends)
         Map<Long, List<Long>> femaleUserMovieGenreMap = matchCandidateConvertorByMap.movieGenreCandidateToMap(femaleUserMovieGenreMatchCandidates);
 
         List<Matches> pairs = finalMatchedPairList.stream()
-                .map(pair -> new MatchedPair(
-                        maleUsers.get(pair.maleUserIndex()),
-                        femaleUsers.get(pair.femaleUserIndex()),
-                        pair.score()
-                ))
+                .map(pair -> tempMathConverterByMatchedPair.
+                        tempMatchToMatchedPair(pair, maleUsers, femaleUsers)
+                )
                 .map(pair -> Matches.create(
                         pair.maleUser(),
                         pair.femaleUser(),
@@ -98,9 +103,12 @@ public class MatchSaveService {    // 이부분 수정(extends)
                                 femaleUserMovieGenreMap),
                         pair.score()
                 ))
+                .peek(pair -> {
+                    pair.getMaleUser().updateStatus(Status.MATCHED);
+                    pair.getFemaleUser().updateStatus(Status.MATCHED);
+                })
                 .toList();
 
         matchRepository.saveAll(pairs);
     }
-
 }

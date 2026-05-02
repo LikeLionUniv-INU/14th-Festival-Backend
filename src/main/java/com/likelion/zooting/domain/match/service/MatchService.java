@@ -123,11 +123,6 @@ public class MatchService {
         // 매칭 (greedy algorithm)
         simulatedMatchResult = matchPolicy.simulateMatching(scoreBoard, indexToMaleUserId, indexToFemaleUserId);
 
-        // 매칭이 하나도 되지 않을 경우
-        if (simulatedMatchResult.finalMatchedPairList().isEmpty()) {
-            throw new GeneralException(MatchErrorCode.NO_MATCHED_USER_CANDIDATES);
-        }
-
         // 만일 매칭 결과 저장할 경우
         if (isSave) {
             matchSaveService.saveResultOfMatch(simulatedMatchResult.finalMatchedPairList(),
