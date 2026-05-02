@@ -69,7 +69,7 @@ public class MatchSaveService {    // 이부분 수정(extends)
                                   List<UserMovieGenreMatchCandidate> maleUserMovieGenreMatchCandidates,
                                   List<UserMovieGenreMatchCandidate> femaleUserMovieGenreMatchCandidates) {
         // 이미 한 번 실행한건가?-> DB에 남성 사용자에 대해 저장되어 있는 여부로 확인
-        if (matchRepository.existsByMaleUser_GenderAndMaleUser_Status(Gender.MALE, Status.SUBMITTED)) {
+        if (matchRepository.existsByMaleUser_GenderAndMaleUser_Status(Gender.MALE, Status.MATCHED)) {
             throw new GeneralException(MatchErrorCode.DUPLICATE_EXECUTION_OF_MATCH_SAVE);
         }
 
