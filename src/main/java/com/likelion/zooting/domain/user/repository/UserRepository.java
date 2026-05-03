@@ -11,9 +11,6 @@ import java.util.Optional;
 
 @Repository
 public interface UserRepository extends JpaRepository<User,Long> {
-    Optional<User> findByUserId(Long userId);
-    boolean existsByUserId(Long userId);
-    List<User> findAllByGender(Gender gender);
     List<User> findByGenderAndStatus(Gender gender, Status status);
     Optional<User> findByInstagramId(String instagramId);
 }

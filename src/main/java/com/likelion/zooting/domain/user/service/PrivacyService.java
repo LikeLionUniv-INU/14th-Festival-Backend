@@ -18,8 +18,8 @@ public class PrivacyService {
     private final UserRepository userRepository;
     private final PrivacyMapper privacyMapper;
 
-    public void submitPrivacyConsent(String instagramId, PrivacyRequest request) {
-        User user = userRepository.findByInstagramId(instagramId)
+    public void submitPrivacyConsent(Long userId, PrivacyRequest request) {
+        User user = userRepository.findById(userId)
                 .orElseThrow(() -> new GeneralException(UserErrorCode.USER_NOT_FOUND));
 
         if (Boolean.FALSE.equals(request.privacyConsent())) {

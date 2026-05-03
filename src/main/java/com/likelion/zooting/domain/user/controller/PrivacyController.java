@@ -28,8 +28,8 @@ public class PrivacyController implements PrivacyControllerDocs {
             throw new GeneralException(GlobalErrorCode.UNAUTHORIZED);
         }
 
-        String instagramId = authentication.getName();
-        privacyService.submitPrivacyConsent(instagramId, request);
+        Long userId = Long.valueOf(authentication.getName());
+        privacyService.submitPrivacyConsent(userId, request);
 
         return ResponseEntity.ok(
                 ApiResponse.success(null)
