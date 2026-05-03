@@ -5,5 +5,5 @@ package com.likelion.zooting.domain.onboarding.dto;
  * JSON 예시: { "profileCreated": true }
  */
 public record OnboardingResponse(
-    boolean profileCreated
+    boolean isComplete
 ) {}

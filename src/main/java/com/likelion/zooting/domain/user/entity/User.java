@@ -46,6 +46,15 @@ public class User {
         this.status = Status.IN_PROGRESS;
     }
 
+    public void updateOnboarding(Gender gender, AnimalType animalType) {
+        this.gender = gender;
+        this.animalType = animalType;
+    }
+
+    public void markSubmitted() {
+        this.status = Status.SUBMITTED;
+    }
+
     public void updatePrivacyConsent(Boolean privacyConsent) {
         this.privacyConsent = privacyConsent;
     }
