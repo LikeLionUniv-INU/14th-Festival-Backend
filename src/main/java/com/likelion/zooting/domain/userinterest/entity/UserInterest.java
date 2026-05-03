@@ -22,4 +22,9 @@ public class UserInterest {
     @ManyToOne(fetch = FetchType.LAZY)  // 최적화를 위해 INTEREST를 DB에서 가져오지 않도록 설정
     @JoinColumn(name = "INTEREST_ID")   // 외래키 설정
     private Interest interest;  // DB로 저장될 땐 PK로 저장되지만, Entity로 가져오므로 interest로 지었다.
+
+    public UserInterest(User user, Interest interest) {
+        this.user = user;
+        this.interest = interest;
+    }
 }

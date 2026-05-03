@@ -26,10 +26,10 @@ public class MockController {
 //        return ApiResponse.success();
 //    }
 
-    @PostMapping("/onboarding/submit")
-    public ApiResponse<Void> submitOnboarding() {
-        return ApiResponse.success();
-    }
+//    @PostMapping("/onboarding/submit")
+//    public ApiResponse<Void> submitOnboarding() {
+//        return ApiResponse.success();
+//    }
 
     @GetMapping("/profile")
     public ApiResponse<Map<String, Object>> getProfile() {

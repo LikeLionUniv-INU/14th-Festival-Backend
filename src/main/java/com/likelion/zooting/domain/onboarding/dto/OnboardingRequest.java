@@ -5,15 +5,15 @@ import java.util.List;
 
 public record OnboardingRequest(
     @NotNull(message = "성별은 필수입니다")
-    @Pattern(regexp = "MALE|FEMALE", message = "성별은 MALE 또는 FEMALE이어야 합니다")
+    @Pattern(regexp = "male|female", message = "성별은 male 또는 female이어야 합니다")
     String gender,
 
     @NotBlank(message = "내 동물상은 필수입니다")
-    String myAnimalType,
+    String animalType,
 
     @NotNull
     @Size(min = 3, max = 3, message = "원하는 상대 동물상은 정확히 3개를 선택해야 합니다")
-    List<String> preferredAnimalTypes,
+    List<String> preferredAnimals,
 
     @NotNull
     @Size(min = 3, max = 3, message = "관심사는 정확히 3개를 선택해야 합니다")
