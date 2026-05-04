@@ -19,18 +19,6 @@ public class ProfileService {
   private final UserRepository userRepository;
   private final UserInterestRepository userInterestRepository; // Repository 주입 필요
 
-  private static final Map<String, String> MODIFIER_MAP = Map.of(
-      "스포츠", "스포츠광",
-      "뮤지컬/연극", "뮤덕",
-      "반려동물", "집사",
-      "여행", "탐험하는",
-      "맛집탐방", "맛잘알",
-      "자기계발", "갓생러",
-      "덕질", "마니아",
-      "음악감상", "음잘알",
-      "게임", "게이머"
-  );
-
   @Transactional(readOnly = true)
   public ProfileResponse getProfile(Long userId) {
     User user = userRepository.findById(userId)
@@ -47,8 +35,10 @@ public class ProfileService {
     String modifier = "멋진";
     if (!userInterests.isEmpty()) {
       int randomIndex = (int) (Math.random() * userInterests.size());
-      String interestName = userInterests.get(randomIndex).getInterest().getInterestName();
-      modifier = MODIFIER_MAP.getOrDefault(interestName, "멋진");
+      String dbTag = userInterests.get(randomIndex).getInterest().getTag();
+      if (dbTag != null && !dbTag.isEmpty()) {
+        modifier = dbTag;
+      }
     }
 
     String profileTag = modifier + " " + user.getAnimalType().getAnimalName();
