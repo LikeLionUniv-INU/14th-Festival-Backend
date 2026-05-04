@@ -1,10 +1,13 @@
 package com.likelion.zooting.domain.profile.service;
 
+import com.likelion.zooting.domain.onboarding.exception.OnboardingErrorCode;
 import com.likelion.zooting.domain.profile.dto.ProfileResponse;
 import com.likelion.zooting.domain.user.entity.User;
+import com.likelion.zooting.domain.user.exception.UserErrorCode;
 import com.likelion.zooting.domain.user.repository.UserRepository;
 import com.likelion.zooting.domain.userinterest.entity.UserInterest;
 import com.likelion.zooting.domain.userinterest.repository.UserInterestRepository;
+import com.likelion.zooting.global.exception.GeneralException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,10 +25,10 @@ public class ProfileService {
   @Transactional(readOnly = true)
   public ProfileResponse getProfile(Long userId) {
     User user = userRepository.findById(userId)
-        .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+        .orElseThrow(() -> new GeneralException(UserErrorCode.USER_NOT_FOUND));
 
     if (user.getAnimalType() == null) {
-      throw new IllegalStateException("온보딩 정보가 존재하지 않습니다.");
+      throw new GeneralException(OnboardingErrorCode.ONBOARDING_NOT_FOUND);
     }
 
     // 1. UserInterestRepository를 통해 사용자의 관심사 목록 직접 조회
