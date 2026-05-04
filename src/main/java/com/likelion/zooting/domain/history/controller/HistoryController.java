@@ -22,8 +22,11 @@ public class HistoryController implements HistoryControllerDocs {
         if(historyResponse.totalUserCount() <= 0){
             throw new GeneralException(HistoryErrorCode.NO_USER_FOR_CREATE_HISTORY);
         }
+        int actualProcessedCount = historyResponse.matchedUserCount() +
+                historyResponse.unmatchedUserCount() +
+                historyResponse.erredUserCount();
         // 2. 매칭 결과(Matches)가 없어 이력이 생성되지 않은 경우 (403)
-        if(historyResponse.matchedUserCount() <= 0){
+        if(actualProcessedCount <= 0){
             throw new GeneralException(HistoryErrorCode.BEFORE_EXECUTE_MATCH_SAVED);
         }
         return ResponseEntity.ok(ApiResponse.success(historyResponse));
