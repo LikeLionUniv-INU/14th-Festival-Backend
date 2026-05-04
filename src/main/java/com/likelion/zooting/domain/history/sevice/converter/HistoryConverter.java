@@ -5,6 +5,8 @@ import com.likelion.zooting.domain.match.entity.Matches;
 import com.likelion.zooting.domain.user.entity.User;
 import org.springframework.stereotype.Component;
 
+import java.util.Map;
+
 @Component
 public class HistoryConverter {
     /**
@@ -12,16 +14,24 @@ public class HistoryConverter {
      * @param matches 매칭 정보
      * @return 남성 기준으로 생성된 이력 결과
      */
-    public History toMaleHistory(Matches matches){
-        return History.createMatchedUserHistory(matches.getMaleUser(), matches.getFemaleUser(), matches);
+    public History toMaleHistory(Matches matches, Map<Long, String> animalTypeMap){
+        String userAnimalType = animalTypeMap.get(matches
+                .getMaleUser()
+                .getAnimalType()
+                .getAnimalTypeId());
+        return History.createMatchedUserHistory(matches.getMaleUser(), matches.getFemaleUser(), matches, userAnimalType);
     }
     /**
      * 여성 사용자에 대한 매칭 상태 history 변환(여성 -> user, 남성 -> partner)
      * @param matches 매칭 정보
      * @return 여성 기준으로 생성된 이력 결과
      */
-    public History toFemaleHistory(Matches matches){
-        return History.createMatchedUserHistory(matches.getFemaleUser(), matches.getFemaleUser(), matches);
+    public History toFemaleHistory(Matches matches, Map<Long, String> animalTypeMap){
+        String userAnimalType = animalTypeMap.get(matches
+                .getFemaleUser()
+                .getAnimalType()
+                .getAnimalTypeId());
+        return History.createMatchedUserHistory(matches.getFemaleUser(), matches.getMaleUser(), matches,  userAnimalType);
     }
 
     /**
@@ -29,8 +39,11 @@ public class HistoryConverter {
      * @param user 매칭되지 않는 사용자
      * @return 매칭 안됨 상태의 이력 결과
      */
-    public History toUnmatchedHistory(User user){
-        return History.createUnmatchedUserHistory(user);
+    public History toUnmatchedHistory(User user, Map<Long, String> animalTypeMap){
+        String userAnimalType = animalTypeMap.get(user
+                .getAnimalType()
+                .getAnimalTypeId());
+        return History.createUnmatchedUserHistory(user, userAnimalType);
     }
 
     /**
@@ -38,7 +51,10 @@ public class HistoryConverter {
      * @param user 오류가 발생한 사용자
      * @return 오류 상태의 이력 결과
      */
-    public History toErrorHistory(User user){
-        return History.createErroredUserHistory(user);
+    public History toErrorHistory(User user, Map<Long, String> animalTypeMap){
+        String userAnimalType = animalTypeMap.get(user
+                .getAnimalType()
+                .getAnimalTypeId());
+        return History.createErroredUserHistory(user, userAnimalType);
     }
 }
