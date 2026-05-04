@@ -1,6 +1,6 @@
 package com.likelion.zooting.domain.profile.service;
 
-import com.likelion.zooting.domain.onboarding.exception.OnboardingErrorCode;
+import com.likelion.zooting.domain.interest.entity.Interest;
 import com.likelion.zooting.domain.profile.dto.ProfileResponse;
 import com.likelion.zooting.domain.user.entity.User;
 import com.likelion.zooting.domain.user.exception.UserErrorCode;
@@ -13,44 +13,69 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class ProfileService {
 
-  private final UserRepository userRepository;
-  private final UserInterestRepository userInterestRepository; // Repository 주입 필요
+  private static final String RELEASE_TIME = "18:00";
+  private static final String RELEASE_MESSAGE = "매칭 결과는 18시에 공개됩니다.";
 
-  @Transactional(readOnly = true)
+  private final UserRepository userRepository;
+  private final UserInterestRepository userInterestRepository;
+
   public ProfileResponse getProfile(Long userId) {
     User user = userRepository.findById(userId)
-        .orElseThrow(() -> new GeneralException(UserErrorCode.USER_NOT_FOUND));
+        .orElseThrow(() -> new GeneralException(UserErrorCode.PROFILE_NOT_FOUND));
 
     if (user.getAnimalType() == null) {
-      throw new GeneralException(OnboardingErrorCode.ONBOARDING_NOT_FOUND);
+      throw new GeneralException(UserErrorCode.PROFILE_NOT_FOUND);
     }
 
-    // 1. UserInterestRepository를 통해 사용자의 관심사 목록 직접 조회
-    List<UserInterest> userInterests = userInterestRepository.findAllByUser(user);
+    List<UserInterest> userInterests = userInterestRepository.findAllByUserIdWithInterest(userId);
 
-    // 2. 무작위 수식어 추출 (사용자가 선택한 3개 중 1개)
-    String modifier = "멋진";
-    if (!userInterests.isEmpty()) {
-      int randomIndex = (int) (Math.random() * userInterests.size());
-      String dbTag = userInterests.get(randomIndex).getInterest().getTag();
-      if (dbTag != null && !dbTag.isEmpty()) {
-        modifier = dbTag;
-      }
+    if (userInterests.isEmpty()) {
+      throw new GeneralException(UserErrorCode.PROFILE_NOT_FOUND);
     }
 
-    String profileTag = modifier + " " + user.getAnimalType().getAnimalName();
+    String animalName = user.getAnimalType().getAnimalName();
+    String interestTag = getRepresentativeInterestTag(userInterests);
 
-    return ProfileResponse.builder()
-        .profileTag(profileTag)
-        .animalType(user.getAnimalType().getAnimalName())
-        .releaseTime("18:00")
-        .releaseMessage("매칭 결과는 18시에 공개됩니다!")
-        .build();
+    return new ProfileResponse(
+        createProfileTag(interestTag, animalName),
+        convertAnimalTypeToCode(animalName),
+        RELEASE_TIME,
+        RELEASE_MESSAGE
+    );
+  }
+
+  private String getRepresentativeInterestTag(List<UserInterest> userInterests) {
+    return userInterests.stream()
+        .map(UserInterest::getInterest)
+        .filter(interest -> interest != null && interest.getTag() != null)
+        .map(Interest::getTag)
+        .findFirst()
+        .orElseThrow(() -> new GeneralException(UserErrorCode.PROFILE_NOT_FOUND));
+  }
+
+  // 관심사 태그 + 동물상으로 프로필 태그 생성
+  private String createProfileTag(String interestTag, String animalName) {
+    return interestTag + " " + animalName;
+  }
+
+  private String convertAnimalTypeToCode(String animalName) {
+    return switch (animalName) {
+      case "토끼" -> "rabbit";
+      case "강아지" -> "dog";
+      case "고양이" -> "cat";
+      case "여우" -> "fox";
+      case "곰" -> "bear";
+      case "공룡" -> "dinosaur";
+      case "햄스터" -> "hamster";
+      case "늑대" -> "wolf";
+      case "사슴" -> "deer";
+      default -> animalName;
+    };
   }
 }
