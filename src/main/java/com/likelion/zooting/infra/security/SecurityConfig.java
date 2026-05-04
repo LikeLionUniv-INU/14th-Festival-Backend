@@ -35,7 +35,8 @@ public class SecurityConfig {
                                 "/v3/api-docs/**",
                                 "/actuator/health",
                                 "/actuator/prometheus",
-                                "/api/onboarding/instagram"
+                                "/api/onboarding/instagram",
+                                "/api/internal/**"
                         ).permitAll()
                         .anyRequest().authenticated()
                 )
