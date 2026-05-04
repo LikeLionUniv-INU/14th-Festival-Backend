@@ -31,14 +31,14 @@ public class MockController {
 //        return ApiResponse.success();
 //    }
 
-    @GetMapping("/profile")
-    public ApiResponse<Map<String, Object>> getProfile() {
-        return ApiResponse.success(Map.of(
-                "profileTag", "감성적인 토끼",
-                "animalType", "RABBIT",
-                "releaseTime", "18:00"
-        ));
-    }
+//    @GetMapping("/profile")
+//    public ApiResponse<Map<String, Object>> getProfile() {
+//        return ApiResponse.success(Map.of(
+//                "profileTag", "감성적인 토끼",
+//                "animalType", "RABBIT",
+//                "releaseTime", "18:00"
+//        ));
+//    }
 
     @PostMapping("/match/result")
     public ApiResponse<Map<String, Object>> getMatchResult() {
