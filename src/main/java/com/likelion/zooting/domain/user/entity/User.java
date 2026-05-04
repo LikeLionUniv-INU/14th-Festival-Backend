@@ -3,6 +3,7 @@ package com.likelion.zooting.domain.user.entity;
 import com.likelion.zooting.domain.animaltype.entity.AnimalType;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
 
@@ -34,6 +35,7 @@ public class User {
     @Column(name = "STATUS", length = 10)
     private Status status;  // 처리 상태
 
+    @CreationTimestamp
     @Column(name = "CREATED_AT", updatable = false) // 수정 못하게 설정
     private LocalDateTime createdAt;    // 생성 시간
 
