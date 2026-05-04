@@ -27,7 +27,7 @@ public interface HistoryControllerDocs {
             ),
             @ApiResponse(
                     responseCode = "403",
-                    description = "매칭 저장 미실행",
+                    description = "생성할 이력이 없습니다.",
                     content = @Content(schema = @Schema(implementation = com.likelion.zooting.global.response.ApiResponse.class))
             ),
             @ApiResponse(
