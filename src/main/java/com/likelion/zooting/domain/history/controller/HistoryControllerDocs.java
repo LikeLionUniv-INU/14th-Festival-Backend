@@ -8,11 +8,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
 
 @Tag(name = "History", description = "이력 관리 관련 API")
-@RequestMapping("/api/internal/history")
 public interface HistoryControllerDocs {
 
     @Operation(
@@ -36,6 +33,5 @@ public interface HistoryControllerDocs {
                     content = @Content(schema = @Schema(implementation = com.likelion.zooting.global.response.ApiResponse.class))
             )
     })
-    @PostMapping("/create")
     ResponseEntity<com.likelion.zooting.global.response.ApiResponse<HistoryResponse>> createHistories();
 }

@@ -7,6 +7,7 @@ import com.likelion.zooting.global.exception.GeneralException;
 import com.likelion.zooting.global.response.ApiResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -19,6 +20,7 @@ public class MatchController implements MatchControllerDocs {
     private final MatchService matchService;
 
     @Override
+    @PostMapping("/simulate")
     public ResponseEntity<ApiResponse<MatchResponse>> simulateMatch() {
         // 시간 검증 로직 분리
         validateMatchTime();
@@ -29,6 +31,7 @@ public class MatchController implements MatchControllerDocs {
     }
 
     @Override
+    @PostMapping("/run")
     public ResponseEntity<ApiResponse<MatchResponse>> runMatch() {
         // 시간 검증 로직 분리
         validateMatchTime();
