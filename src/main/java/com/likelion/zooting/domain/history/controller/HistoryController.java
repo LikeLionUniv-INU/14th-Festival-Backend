@@ -7,6 +7,7 @@ import com.likelion.zooting.global.exception.GeneralException;
 import com.likelion.zooting.global.response.ApiResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -15,7 +16,9 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/internal/history")
 public class HistoryController implements HistoryControllerDocs {
     private final HistoryService historyService;
+
     @Override
+    @PostMapping("/create")
     public ResponseEntity<ApiResponse<HistoryResponse>> createHistories() {
         HistoryResponse historyResponse = historyService.createHistories();
         // 1. 유저 데이터가 시스템에 아예 없는 경우 (404)
