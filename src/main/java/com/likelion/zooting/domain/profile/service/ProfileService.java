@@ -69,12 +69,12 @@ public class ProfileService {
       case "토끼" -> "rabbit";
       case "강아지" -> "dog";
       case "고양이" -> "cat";
-      case "여우" -> "fox";
       case "곰" -> "bear";
       case "공룡" -> "dinosaur";
+      case "원숭이" -> "monkey";
       case "햄스터" -> "hamster";
-      case "늑대" -> "wolf";
       case "사슴" -> "deer";
+      case "병아리" -> "chick";
       default -> animalName;
     };
   }
