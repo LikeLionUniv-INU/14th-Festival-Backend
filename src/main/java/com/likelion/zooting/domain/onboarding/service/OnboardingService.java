@@ -1,6 +1,7 @@
 package com.likelion.zooting.domain.onboarding.service;
 
 import com.likelion.zooting.domain.animaltype.entity.AnimalType;
+import com.likelion.zooting.domain.animaltype.entity.Scope;
 import com.likelion.zooting.domain.animaltype.repository.AnimalTypeRepository;
 import com.likelion.zooting.domain.interest.entity.Interest;
 import com.likelion.zooting.domain.interest.repository.InterestRepository;
@@ -59,15 +60,36 @@ public class OnboardingService {
     // 4. User 정보 업데이트 (성별 + 본인 동물상)
     user.updateOnboarding(Gender.valueOf(request.gender().toUpperCase()), myAnimal);
 
-    // 5. 선호 동물상 저장
+    // 5. 선호 동물상 저장 로직
     List<String> preferredList = request.preferredAnimals();
 
-    for (String animalName : preferredList) {
-      AnimalType animalType = animalTypeRepository.findByAnimalName(animalName)
-          .orElseThrow(() -> new GeneralException(OnboardingErrorCode.ANIMAL_TYPE_COUNT_INVALID));
+    if (preferredList == null || preferredList.isEmpty()) {
+      throw new GeneralException(OnboardingErrorCode.ANIMAL_TYPE_COUNT_INVALID);
+    }
 
-      UserPreferredAnimalType preferredAnimal = new UserPreferredAnimalType(user, animalType);
-      preferredAnimalRepository.save(preferredAnimal);
+// "상관없음" 선택 여부 확인
+    boolean isIndifferent = preferredList.size() == 1 && "상관없음".equals(preferredList.get(0));
+
+    if (isIndifferent) {
+      // 성별에 따른 모든 가능한 동물상 조회 (COMMON + 사용자 성별 전용)
+      // 예: MALE일 경우 COMMON(강아지, 고양이, 햄스터) + MALE(곰, 원숭이, 공룡)
+      List<AnimalType> allPossibleAnimals = animalTypeRepository.findByScopeIn(
+          List.of(Scope.COMMON, Scope.valueOf(user.getGender().name().toUpperCase()))
+      );
+
+      for (AnimalType animalType : allPossibleAnimals) {
+        preferredAnimalRepository.save(new UserPreferredAnimalType(user, animalType));
+      }
+    } else if (preferredList.size() == 3) {
+      // 일반적인 3개 선택 로직
+      for (String animalName : preferredList) {
+        AnimalType animalType = animalTypeRepository.findByAnimalName(animalName)
+            .orElseThrow(() -> new GeneralException(OnboardingErrorCode.ANIMAL_TYPE_NOT_FOUND));
+        preferredAnimalRepository.save(new UserPreferredAnimalType(user, animalType));
+      }
+    } else {
+      // 1개(상관없음 아님)나 2개 등을 선택한 경우 에러 처리
+      throw new GeneralException(OnboardingErrorCode.ANIMAL_TYPE_COUNT_INVALID);
     }
 
     // 6. 관심사 저장

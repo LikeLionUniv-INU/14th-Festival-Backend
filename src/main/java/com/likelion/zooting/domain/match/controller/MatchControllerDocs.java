@@ -8,11 +8,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
 
 @Tag(name = "Match", description = "매칭 관련 API")
-@RequestMapping("/api/internal/match")
 public interface MatchControllerDocs {
 
     @Operation(
@@ -36,7 +33,6 @@ public interface MatchControllerDocs {
                     content = @Content(schema = @Schema(implementation = com.likelion.zooting.global.response.ApiResponse.class))
             )
     })
-    @PostMapping("/simulate")
     ResponseEntity<com.likelion.zooting.global.response.ApiResponse<MatchResponse>> simulateMatch();
 
     @Operation(
@@ -65,6 +61,5 @@ public interface MatchControllerDocs {
                     content = @Content(schema = @Schema(implementation = com.likelion.zooting.global.response.ApiResponse.class))
             )
     })
-    @PostMapping("/run")
     ResponseEntity<com.likelion.zooting.global.response.ApiResponse<MatchResponse>> runMatch();
 }
