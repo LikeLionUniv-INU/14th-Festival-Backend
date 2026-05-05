@@ -33,10 +33,6 @@ public class AuthService {
             throw new GeneralException(UserErrorCode.PIN_MISMATCH);
         }
 
-        if (isSurveyCompleted(user.getStatus())) {
-            throw new GeneralException(UserErrorCode.ALREADY_COMPLETED);
-        }
-
         String accessToken = jwtTokenProvider.createAccessToken(user.getUserId());
         return authMapper.toAuthResponse(user, accessToken);
     }
