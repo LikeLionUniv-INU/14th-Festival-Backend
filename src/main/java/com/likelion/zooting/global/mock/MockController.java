@@ -40,11 +40,11 @@ public class MockController {
 //        ));
 //    }
 
-    @PostMapping("/match/result")
-    public ApiResponse<Map<String, Object>> getMatchResult() {
-        return ApiResponse.success(Map.of(
-                "partnerName", "홍길동",
-                "score", 95
-        ));
-    }
+//    @PostMapping("/match/result")
+//    public ApiResponse<Map<String, Object>> getMatchResult() {
+//        return ApiResponse.success(Map.of(
+//                "partnerName", "홍길동",
+//                "score", 95
+//        ));
+//    }
 }
