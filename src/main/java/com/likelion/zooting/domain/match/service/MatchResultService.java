@@ -22,13 +22,14 @@ import java.time.ZoneId;
 public class MatchResultService {
 
     private static final LocalTime MATCH_RESULT_OPEN_TIME = LocalTime.of(18, 0);
+    private static final LocalTime NEXT_DAY_RESET_TIME = LocalTime.of(10, 0);
     private static final ZoneId KOREA_ZONE_ID = ZoneId.of("Asia/Seoul");
 
     private final UserRepository userRepository;
     private final MatchRepository matchRepository;
 
     public MatchResultResponse getMatchResult(MatchResultRequest request) {
-        validateAfterOpenTime();
+        validateResultViewTime();
 
         User user = userRepository.findByInstagramId(request.instagramId())
                 .orElseThrow(() -> new GeneralException(UserErrorCode.USER_NOT_FOUND));
@@ -56,11 +57,14 @@ public class MatchResultService {
         throw new GeneralException(MatchErrorCode.MATCH_RESULT_NOT_FOUND);
     }
 
-    // 매칭 결과는 18시 이후에만 조회할 수 있다.
-    private void validateAfterOpenTime() {
+    // 매칭 결과는 18시 이후부터 다음날 초기화 전까지 조회할 수 있다.
+    private void validateResultViewTime() {
         LocalTime now = LocalTime.now(KOREA_ZONE_ID);
 
-        if (now.isBefore(MATCH_RESULT_OPEN_TIME)) {
+        boolean isAfterOpenTime = !now.isBefore(MATCH_RESULT_OPEN_TIME);
+        boolean isBeforeResetTime = now.isBefore(NEXT_DAY_RESET_TIME);
+
+        if (!isAfterOpenTime && !isBeforeResetTime) {
             throw new GeneralException(MatchErrorCode.MATCH_TIME_FORBIDDEN);
         }
     }
