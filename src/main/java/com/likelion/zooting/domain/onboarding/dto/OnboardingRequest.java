@@ -12,7 +12,7 @@ public record OnboardingRequest(
     String animalType,
 
     @NotNull
-    @Size(min = 3, max = 3, message = "원하는 상대 동물상은 정확히 3개를 선택해야 합니다")
+    @NotEmpty(message = "원하는 상대 동물상은 필수입니다.")
     List<String> preferredAnimals,
 
     @NotNull
