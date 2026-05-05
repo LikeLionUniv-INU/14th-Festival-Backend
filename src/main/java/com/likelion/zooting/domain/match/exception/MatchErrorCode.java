@@ -16,6 +16,8 @@ public enum MatchErrorCode implements BaseErrorCode {
     NO_MATCHED_USER_CANDIDATES("MATCH_4041", "매칭 대상 사용자가 없습니다.", HttpStatus.NOT_FOUND),
 
     DUPLICATE_EXECUTION_OF_MATCH_SAVE("MATCH_4091", "이미 매칭 결과가 저장되어 있습니다.", HttpStatus.CONFLICT),
+
+    MATCH_RESULT_NOT_FOUND("MATCH_4041", "매칭 결과를 찾을 수 없습니다.", HttpStatus.NOT_FOUND),
     ;
 
     private final String code;
