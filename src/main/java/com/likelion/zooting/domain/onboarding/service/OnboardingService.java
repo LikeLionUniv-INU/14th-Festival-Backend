@@ -78,10 +78,13 @@ public class OnboardingService {
     boolean isIndifferent = preferredList.size() == 1 && "상관없음".equals(preferredList.get(0));
 
     if (isIndifferent) {
-      // 성별에 따른 모든 가능한 동물상 조회 (COMMON + 사용자 성별 전용)
-      // 예: MALE일 경우 COMMON(강아지, 고양이, 햄스터) + MALE(곰, 원숭이, 공룡)
+      // 상대 성별에 따른 모든 가능한 동물상 조회
+      // 예: MALE 사용자가 상관없음을 선택하면 COMMON + FEMALE 동물상을 선호 동물상으로 저장
+      // 예: FEMALE 사용자가 상관없음을 선택하면 COMMON + MALE 동물상을 선호 동물상으로 저장
+      Scope targetScope = gender == Gender.MALE ? Scope.FEMALE : Scope.MALE;
+
       List<AnimalType> allPossibleAnimals = animalTypeRepository.findByScopeIn(
-              List.of(Scope.COMMON, Scope.valueOf(user.getGender().name()))
+              List.of(Scope.COMMON, targetScope)
       );
 
       for (AnimalType animalType : allPossibleAnimals) {
