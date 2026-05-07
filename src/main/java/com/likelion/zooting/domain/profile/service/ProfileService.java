@@ -71,7 +71,7 @@ public class ProfileService {
       case "고양이" -> "cat";
       case "곰" -> "bear";
       case "공룡" -> "dinosaur";
-      case "원숭이" -> "monkey";
+      case "여우" -> "fox";
       case "햄스터" -> "hamster";
       case "사슴" -> "deer";
       case "병아리" -> "chick";
