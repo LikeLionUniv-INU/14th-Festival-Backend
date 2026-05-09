@@ -59,7 +59,8 @@ public class SecurityConfig {
                 "http://localhost:3000",
                 "https://14th-festival-frontend.vercel.app",
                 "https://zooting.site",
-                "https://www.zooting.site"
+                "https://www.zooting.site",
+                "http://192.168.45.40:3000"
         ));
         config.setAllowedMethods(List.of("*"));
         config.setAllowedHeaders(List.of("*"));
